@@ -1,0 +1,285 @@
+"use client";
+
+import { useState } from "react";
+import type React from "react";
+import { ImageUp, Save } from "lucide-react";
+import type { IconName, SiteContent } from "@/lib/site-content";
+
+const iconOptions: Array<{ value: IconName; label: string }> = [
+  { value: "rotate", label: "旋转/轴承" },
+  { value: "shield", label: "防滑/保护" },
+  { value: "cable", label: "线材/可调节" },
+  { value: "zap", label: "速度/轻量" },
+  { value: "badge", label: "认证/综合" }
+];
+
+export function SiteContentForm({ initialContent }: { initialContent: SiteContent }) {
+  const [content, setContent] = useState(initialContent);
+  const [message, setMessage] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  async function save() {
+    setSaving(true);
+    setMessage("");
+
+    try {
+      const response = await fetch("/api/admin/content", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content })
+      });
+      const result = (await response.json()) as { success: boolean; message?: string };
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || "保存失败。");
+      }
+
+      setMessage("已保存，刷新首页即可看到最新内容。");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "保存失败。");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function updateImage(path: string, url: string) {
+    setDeepValue(path, url);
+  }
+
+  function setDeepValue(path: string, value: string) {
+    setContent((current) => {
+      const next = structuredClone(current);
+      const parts = path.split(".");
+      let target: Record<string, unknown> | unknown[] = next as unknown as Record<string, unknown>;
+
+      for (let index = 0; index < parts.length - 1; index += 1) {
+        target = (target as Record<string, unknown>)[parts[index]] as Record<string, unknown> | unknown[];
+      }
+
+      (target as Record<string, unknown>)[parts[parts.length - 1]] = value;
+      return next;
+    });
+  }
+
+  return (
+    <div className="grid gap-5">
+      <Section title="品牌与联系方式">
+        <div className="grid gap-4 md:grid-cols-2">
+          <TextField label="品牌名" value={content.brand.name} onChange={(value) => setDeepValue("brand.name", value)} />
+          <TextField label="邮箱" value={content.brand.email} onChange={(value) => setDeepValue("brand.email", value)} />
+          <TextField label="WhatsApp 号码" value={content.brand.whatsapp} onChange={(value) => setDeepValue("brand.whatsapp", value)} />
+          <TextField label="Instagram 链接" value={content.brand.instagram} onChange={(value) => setDeepValue("brand.instagram", value)} />
+          <TextField label="TikTok 链接" value={content.brand.tiktok} onChange={(value) => setDeepValue("brand.tiktok", value)} />
+        </div>
+      </Section>
+
+      <Section title="首页 Hero">
+        <div className="grid gap-4">
+          <TextField label="小标题" value={content.hero.eyebrow} onChange={(value) => setDeepValue("hero.eyebrow", value)} />
+          <TextField label="主标题" value={content.hero.title} onChange={(value) => setDeepValue("hero.title", value)} />
+          <TextareaField label="描述" value={content.hero.description} onChange={(value) => setDeepValue("hero.description", value)} />
+          <ImageField label="Hero 图片" value={content.hero.image} onChange={(url) => updateImage("hero.image", url)} />
+          <TextField
+            label="图片裁切位置"
+            value={content.hero.imagePosition}
+            onChange={(value) => setDeepValue("hero.imagePosition", value)}
+            hint="例如 68% 50%，第一个值是左右位置，第二个值是上下位置。"
+          />
+        </div>
+      </Section>
+
+      <Section title="五张全屏图模块">
+        <div className="grid gap-4">
+          <TextField label="模块小标题" value={content.detailsIntro.eyebrow} onChange={(value) => setDeepValue("detailsIntro.eyebrow", value)} />
+          <TextField label="模块标题" value={content.detailsIntro.title} onChange={(value) => setDeepValue("detailsIntro.title", value)} />
+          {content.productDetails.map((item, index) => (
+            <div key={index} className="rounded-[8px] border border-line bg-mist p-4">
+              <p className="mb-4 text-sm font-semibold text-ink">全屏图 {index + 1}</p>
+              <div className="grid gap-4">
+                <TextField label="标题" value={item.title} onChange={(value) => setDeepValue(`productDetails.${index}.title`, value)} />
+                <TextareaField label="描述" value={item.description} onChange={(value) => setDeepValue(`productDetails.${index}.description`, value)} />
+                <ImageField label="图片" value={item.image} onChange={(url) => updateImage(`productDetails.${index}.image`, url)} />
+                <label className="grid gap-2 text-sm font-medium text-graphite">
+                  图标
+                  <select
+                    value={item.icon}
+                    onChange={(event) => setDeepValue(`productDetails.${index}.icon`, event.target.value)}
+                    className="h-11 rounded-[8px] border border-line bg-white px-3 text-ink outline-none focus:border-ocean"
+                  >
+                    {iconOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      <Section title="OEM 定制模块">
+        <div className="grid gap-4">
+          <TextField label="小标题" value={content.oem.eyebrow} onChange={(value) => setDeepValue("oem.eyebrow", value)} />
+          <TextField label="标题" value={content.oem.title} onChange={(value) => setDeepValue("oem.title", value)} />
+          <TextareaField label="描述" value={content.oem.description} onChange={(value) => setDeepValue("oem.description", value)} />
+          <ImageField label="背景图片" value={content.oem.image} onChange={(url) => updateImage("oem.image", url)} />
+          <TextareaField
+            label="定制选项"
+            value={content.oem.options.join("\n")}
+            onChange={(value) =>
+              setContent((current) => ({
+                ...current,
+                oem: {
+                  ...current.oem,
+                  options: value
+                    .split("\n")
+                    .map((item) => item.trim())
+                    .filter(Boolean)
+                }
+              }))
+            }
+            hint="每行一个选项。"
+          />
+        </div>
+      </Section>
+
+      <Section title="询盘区文案">
+        <div className="grid gap-4">
+          <TextField label="小标题" value={content.inquiry.eyebrow} onChange={(value) => setDeepValue("inquiry.eyebrow", value)} />
+          <TextField label="标题" value={content.inquiry.title} onChange={(value) => setDeepValue("inquiry.title", value)} />
+          <TextareaField label="描述" value={content.inquiry.description} onChange={(value) => setDeepValue("inquiry.description", value)} />
+        </div>
+      </Section>
+
+      <div className="sticky bottom-4 z-20 flex flex-col gap-3 rounded-[8px] border border-line bg-white/90 p-4 shadow-soft backdrop-blur sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-sm text-graphite">{message || "修改后点击保存，前台会读取最新内容。"}</p>
+        <button
+          type="button"
+          onClick={save}
+          disabled={saving}
+          className="inline-flex h-11 items-center justify-center gap-2 rounded-[8px] bg-ink px-5 text-sm font-semibold text-white transition hover:bg-graphite disabled:opacity-60"
+        >
+          <Save size={18} />
+          {saving ? "保存中..." : "保存网站内容"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="rounded-[8px] border border-line bg-white p-5 shadow-soft">
+      <h2 className="mb-5 text-xl font-semibold text-ink">{title}</h2>
+      {children}
+    </section>
+  );
+}
+
+function TextField({ label, value, hint, onChange }: { label: string; value: string; hint?: string; onChange: (value: string) => void }) {
+  return (
+    <label className="grid gap-2 text-sm font-medium text-graphite">
+      {label}
+      <input
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className="h-11 rounded-[8px] border border-line bg-white px-3 text-ink outline-none focus:border-ocean"
+      />
+      {hint ? <span className="text-xs font-normal text-graphite">{hint}</span> : null}
+    </label>
+  );
+}
+
+function TextareaField({
+  label,
+  value,
+  hint,
+  onChange
+}: {
+  label: string;
+  value: string;
+  hint?: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <label className="grid gap-2 text-sm font-medium text-graphite">
+      {label}
+      <textarea
+        value={value}
+        rows={3}
+        onChange={(event) => onChange(event.target.value)}
+        className="rounded-[8px] border border-line bg-white px-3 py-3 text-ink outline-none focus:border-ocean"
+      />
+      {hint ? <span className="text-xs font-normal text-graphite">{hint}</span> : null}
+    </label>
+  );
+}
+
+function ImageField({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
+  const [uploading, setUploading] = useState(false);
+  const [message, setMessage] = useState("");
+
+  async function upload(file: File) {
+    setUploading(true);
+    setMessage("");
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: formData
+      });
+      const result = (await response.json()) as { success: boolean; url?: string; storage?: string; message?: string };
+
+      if (!response.ok || !result.success || !result.url) {
+        throw new Error(result.message || "上传失败。");
+      }
+
+      onChange(result.url);
+      setMessage(result.storage === "cloudflare-r2" ? "已上传到 Cloudflare R2。" : "已保存到本地 uploads。");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "上传失败。");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  return (
+    <div className="grid gap-2 text-sm font-medium text-graphite">
+      <span>{label}</span>
+      <div className="grid gap-3 lg:grid-cols-[1fr_auto]">
+        <input
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          className="h-11 rounded-[8px] border border-line bg-white px-3 text-ink outline-none focus:border-ocean"
+        />
+        <label className="inline-flex h-11 cursor-pointer items-center justify-center gap-2 rounded-[8px] border border-line bg-white px-4 text-sm font-semibold text-ink transition hover:border-ink">
+          <ImageUp size={18} />
+          {uploading ? "上传中..." : "上传图片"}
+          <input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            disabled={uploading}
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              if (file) void upload(file);
+              event.target.value = "";
+            }}
+          />
+        </label>
+      </div>
+      {value ? (
+        <div className="overflow-hidden rounded-[8px] border border-line bg-mist">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={value} alt={`${label} preview`} className="max-h-48 w-full object-cover" />
+        </div>
+      ) : null}
+      {message ? <span className="text-xs font-normal text-graphite">{message}</span> : null}
+    </div>
+  );
+}

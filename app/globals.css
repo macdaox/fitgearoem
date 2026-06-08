@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  scroll-behavior: smooth;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #f5f7fa;
+  color: #101114;
+}
+
+::selection {
+  background: #b7f34b;
+  color: #101114;
+}
+
+.section-shell {
+  @apply mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-10;
+}
+
+.eyebrow {
+  @apply text-xs font-semibold uppercase tracking-[0.18em] text-ocean;
+}
+
+.reveal {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .reveal,
+  .detail-card {
+    opacity: 0;
+  }
+}

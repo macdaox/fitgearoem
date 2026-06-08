@@ -1,0 +1,152 @@
+# Wholesale Jump Rope B2B Website
+
+English wholesale inquiry website for custom jump rope buyers, built with Next.js App Router, Tailwind CSS, GSAP ScrollTrigger, Prisma, PostgreSQL and Resend.
+
+## Local Setup
+
+```bash
+npm install
+cp .env.example .env.local
+npm run prisma:generate
+npm run dev
+```
+
+Open `http://localhost:3000`.
+
+## Environment Variables
+
+```bash
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:5432/DATABASE?schema=public"
+ADMIN_EMAIL="admin@example.com"
+ADMIN_PASSWORD="change-this-password"
+RESEND_API_KEY=""
+NEXT_PUBLIC_WHATSAPP_NUMBER="15551234567"
+NEXT_PUBLIC_SITE_URL="https://example.com"
+DEEPSEEK_API_KEY=""
+DEEPSEEK_MODEL="deepseek-chat"
+CLOUDFLARE_R2_ACCOUNT_ID=""
+CLOUDFLARE_R2_ACCESS_KEY_ID=""
+CLOUDFLARE_R2_SECRET_ACCESS_KEY=""
+CLOUDFLARE_R2_BUCKET=""
+CLOUDFLARE_R2_PUBLIC_URL=""
+```
+
+`RESEND_API_KEY` is optional for local layout testing. When it is missing, inquiries are still saved to the database and email notification is skipped.
+
+`DEEPSEEK_API_KEY` is optional. When configured, the admin inquiry page can translate customer messages into Chinese from the backend without exposing the key to the browser.
+
+Cloudflare R2 variables are optional. If they are missing, admin image uploads are saved locally under `public/uploads`. When configured, uploads use Cloudflare R2 through its S3-compatible API and return URLs based on `CLOUDFLARE_R2_PUBLIC_URL`.
+
+On Cloudflare Workers, site content and inquiries are stored in the `SITE_DATA` KV namespace, and uploaded images are stored in the `SITE_IMAGES` R2 bucket. Local filesystem fallback is only for local development.
+
+## Database
+
+Create a PostgreSQL database on Neon, Supabase, Vercel Postgres or another PostgreSQL provider, then run:
+
+```bash
+npm run prisma:migrate
+```
+
+The migration creates the `inquiries` table with customer contact fields, message, status and timestamps.
+
+## Admin
+
+- Login: `http://localhost:3000/admin/login`
+- Inquiry list: `http://localhost:3000/admin/inquiries`
+- Website content: `http://localhost:3000/admin/content`
+- Password source: `ADMIN_PASSWORD`
+- Status values: `new`, `contacted`, `quoted`, `closed`, `spam`
+
+## API
+
+`POST /api/inquiry`
+
+```json
+{
+  "name": "Buyer Name",
+  "email": "buyer@example.com",
+  "whatsapp": "+1 555 123 4567",
+  "country": "United States",
+  "productInterest": "Speed Jump Rope",
+  "quantity": "1000 pcs",
+  "message": "Please quote custom logo and color box packaging."
+}
+```
+
+Required fields: `name`, `email`, `message`.
+
+## Cloudflare Deployment
+
+This project is configured for Cloudflare Workers with OpenNext.
+
+### 1. Login and create Cloudflare resources
+
+```bash
+npx wrangler login
+npx wrangler kv namespace create SITE_DATA
+npx wrangler r2 bucket create jump-rope-site-images
+npx wrangler r2 bucket create jump-rope-b2b-site-opennext-cache
+```
+
+Copy the KV namespace `id` returned by Wrangler into `wrangler.jsonc`:
+
+```jsonc
+"kv_namespaces": [
+  {
+    "binding": "SITE_DATA",
+    "id": "YOUR_KV_NAMESPACE_ID"
+  }
+]
+```
+
+Configure a public R2 domain for `jump-rope-site-images` in Cloudflare, then set `CLOUDFLARE_R2_PUBLIC_URL` in `wrangler.jsonc` to that public domain.
+
+### 2. Add Cloudflare Worker secrets
+
+```bash
+npx wrangler secret put ADMIN_EMAIL
+npx wrangler secret put ADMIN_PASSWORD
+npx wrangler secret put RESEND_API_KEY
+npx wrangler secret put DEEPSEEK_API_KEY
+```
+
+`RESEND_API_KEY` and `DEEPSEEK_API_KEY` may be left blank during early testing, but `ADMIN_PASSWORD` should be changed before going live.
+
+### 3. Preview locally as a Cloudflare Worker
+
+```bash
+cp .dev.vars.example .dev.vars
+npm run cf:preview
+```
+
+Open `http://localhost:8787`.
+
+### 4. Deploy from local machine
+
+```bash
+npm run cf:deploy
+```
+
+### 5. Deploy from GitHub Actions
+
+Create an empty GitHub repository, push this project to `main`, then add these GitHub Actions secrets:
+
+```text
+CLOUDFLARE_ACCOUNT_ID
+CLOUDFLARE_API_TOKEN
+```
+
+The API token needs permission to deploy Workers and read/write the KV/R2 resources used by this project. After that, every push to `main` runs `.github/workflows/deploy-cloudflare.yml`.
+
+## GitHub
+
+This folder is safe to push after checking `.gitignore`. Do not commit `.env.local`, `.dev.vars`, `.data`, `.open-next`, `.wrangler`, or `public/uploads`.
+
+```bash
+git init
+git add .
+git commit -m "Initial Cloudflare-ready website"
+git branch -M main
+git remote add origin git@github.com:YOUR_USER/YOUR_REPO.git
+git push -u origin main
+```

@@ -1,0 +1,44 @@
+{
+  "name": "wholesale-jump-rope-site",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "cf:build": "opennextjs-cloudflare build",
+    "cf:deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "cf:preview": "opennextjs-cloudflare build && wrangler dev",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "postinstall": "prisma generate"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.1063.0",
+    "@opennextjs/cloudflare": "^1.19.11",
+    "@prisma/client": "^6.9.0",
+    "clsx": "^2.1.1",
+    "gsap": "^3.13.0",
+    "lucide-react": "^0.468.0",
+    "next": "^15.3.3",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "resend": "^4.5.1"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
+    "@types/node": "^22.15.29",
+    "@types/react": "^19.0.12",
+    "@types/react-dom": "^19.0.4",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^9.28.0",
+    "eslint-config-next": "^15.3.3",
+    "postcss": "^8.5.6",
+    "prisma": "^6.9.0",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.8.3",
+    "wrangler": "^4.98.0"
+  }
+}
