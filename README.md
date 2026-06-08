@@ -77,66 +77,11 @@ Required fields: `name`, `email`, `message`.
 
 ## Cloudflare Deployment
 
-This project is configured for Cloudflare Workers with OpenNext.
-
-### 1. Login and create Cloudflare resources
-
-```bash
-npx wrangler login
-npx wrangler kv namespace create SITE_DATA
-npx wrangler r2 bucket create jump-rope-site-images
-npx wrangler r2 bucket create jump-rope-b2b-site-opennext-cache
-```
-
-Copy the KV namespace `id` returned by Wrangler into `wrangler.jsonc`:
-
-```jsonc
-"kv_namespaces": [
-  {
-    "binding": "SITE_DATA",
-    "id": "YOUR_KV_NAMESPACE_ID"
-  }
-]
-```
-
-Configure a public R2 domain for `jump-rope-site-images` in Cloudflare, then set `CLOUDFLARE_R2_PUBLIC_URL` in `wrangler.jsonc` to that public domain.
-
-### 2. Add Cloudflare Worker secrets
-
-```bash
-npx wrangler secret put ADMIN_EMAIL
-npx wrangler secret put ADMIN_PASSWORD
-npx wrangler secret put RESEND_API_KEY
-npx wrangler secret put DEEPSEEK_API_KEY
-```
-
-`RESEND_API_KEY` and `DEEPSEEK_API_KEY` may be left blank during early testing, but `ADMIN_PASSWORD` should be changed before going live.
-
-### 3. Preview locally as a Cloudflare Worker
-
-```bash
-cp .dev.vars.example .dev.vars
-npm run cf:preview
-```
-
-Open `http://localhost:8787`.
-
-### 4. Deploy from local machine
-
-```bash
-npm run cf:deploy
-```
-
-### 5. Deploy from GitHub Actions
-
-Create an empty GitHub repository, push this project to `main`, then add these GitHub Actions secrets:
+This project is configured for Cloudflare dashboard deployment through GitHub integration. See the Chinese guide for the exact dashboard settings:
 
 ```text
-CLOUDFLARE_ACCOUNT_ID
-CLOUDFLARE_API_TOKEN
+部署说明.md
 ```
-
-The API token needs permission to deploy Workers and read/write the KV/R2 resources used by this project. After that, every push to `main` runs `.github/workflows/deploy-cloudflare.yml`.
 
 ## GitHub
 
