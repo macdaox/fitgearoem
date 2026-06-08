@@ -1,6 +1,7 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { getSiteDataKv } from "@/lib/cloudflare";
+import { hasR2DataStoreConfig, readR2Json, writeR2Json } from "@/lib/r2-data-store";
 import type { InquiryPayload } from "@/lib/validation";
 
 export type StoredInquiry = Omit<InquiryPayload, "whatsapp" | "country" | "productInterest" | "quantity"> & {
@@ -22,6 +23,7 @@ type LocalInquiryRecord = Omit<StoredInquiry, "createdAt" | "updatedAt"> & {
 const localDataDir = path.join(process.cwd(), ".data");
 const localDataPath = path.join(localDataDir, "inquiries.json");
 const cloudflareInquiriesKey = "inquiries";
+const r2InquiriesKey = "data/inquiries.json";
 
 export function hasDatabaseUrl() {
   return Boolean(process.env.DATABASE_URL);
@@ -44,6 +46,20 @@ export async function createInquiry(data: InquiryPayload) {
       updatedAt: now
     });
     await writeKvInquiries(inquiries);
+    return;
+  }
+
+  if (hasR2DataStoreConfig()) {
+    const r2Inquiries = (await readR2Inquiries()) || [];
+    const now = new Date().toISOString();
+    r2Inquiries.unshift({
+      ...data,
+      id: crypto.randomUUID(),
+      status: "new",
+      createdAt: now,
+      updatedAt: now
+    });
+    await writeR2Json(r2InquiriesKey, r2Inquiries);
     return;
   }
 
@@ -72,6 +88,11 @@ export async function listInquiries(): Promise<StoredInquiry[]> {
     return inquiries.map(toStoredInquiry).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
 
+  if (hasR2DataStoreConfig()) {
+    const r2Inquiries = (await readR2Inquiries()) || [];
+    return r2Inquiries.map(toStoredInquiry).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
   if (hasDatabaseUrl()) {
     const { prisma } = await import("@/lib/prisma");
     return prisma.inquiry.findMany({
@@ -98,6 +119,22 @@ export async function updateInquiryStatus(id: string, status: string) {
       updatedAt: new Date().toISOString()
     };
     await writeKvInquiries(inquiries);
+    return;
+  }
+
+  if (hasR2DataStoreConfig()) {
+    const r2Inquiries = (await readR2Inquiries()) || [];
+    const index = r2Inquiries.findIndex((inquiry) => inquiry.id === id);
+    if (index === -1) {
+      throw new Error("Inquiry not found.");
+    }
+
+    r2Inquiries[index] = {
+      ...r2Inquiries[index],
+      status,
+      updatedAt: new Date().toISOString()
+    };
+    await writeR2Json(r2InquiriesKey, r2Inquiries);
     return;
   }
 
@@ -168,4 +205,9 @@ function toStoredInquiry(inquiry: LocalInquiryRecord): StoredInquiry {
     createdAt: new Date(inquiry.createdAt),
     updatedAt: new Date(inquiry.updatedAt)
   };
+}
+
+async function readR2Inquiries() {
+  const inquiries = await readR2Json<LocalInquiryRecord[]>(r2InquiriesKey);
+  return inquiries && Array.isArray(inquiries) ? inquiries : null;
 }

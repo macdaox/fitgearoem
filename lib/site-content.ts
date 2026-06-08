@@ -1,6 +1,7 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { getSiteDataKv } from "@/lib/cloudflare";
+import { readR2Json, writeR2Json } from "@/lib/r2-data-store";
 
 export type IconName = "rotate" | "shield" | "cable" | "zap" | "badge";
 
@@ -45,6 +46,7 @@ export type SiteContent = {
 
 const contentPath = path.join(process.cwd(), ".data", "site-content.json");
 const cloudflareContentKey = "site-content";
+const r2ContentKey = "data/site-content.json";
 
 export const defaultSiteContent: SiteContent = {
   brand: {
@@ -121,6 +123,11 @@ export async function getSiteContent(): Promise<SiteContent> {
     return defaultSiteContent;
   }
 
+  const r2Content = await readR2Json<Partial<SiteContent>>(r2ContentKey);
+  if (r2Content) {
+    return mergeContent(defaultSiteContent, r2Content);
+  }
+
   try {
     const raw = await readFile(contentPath, "utf8");
     return mergeContent(defaultSiteContent, JSON.parse(raw) as Partial<SiteContent>);
@@ -135,6 +142,10 @@ export async function saveSiteContent(content: SiteContent) {
 
   if (kv) {
     await kv.put(cloudflareContentKey, JSON.stringify(normalizedContent));
+    return;
+  }
+
+  if (await writeR2Json(r2ContentKey, normalizedContent)) {
     return;
   }
 

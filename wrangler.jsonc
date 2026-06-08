@@ -1,7 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "main": ".open-next/worker.js",
-  "name": "jump-rope-b2b-site",
+  "name": "fitgearoem",
   "compatibility_date": "2026-06-09",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "assets": {
@@ -11,23 +11,7 @@
   "services": [
     {
       "binding": "WORKER_SELF_REFERENCE",
-      "service": "jump-rope-b2b-site"
-    }
-  ],
-  "kv_namespaces": [
-    {
-      "binding": "SITE_DATA",
-      "id": "REPLACE_WITH_SITE_DATA_KV_ID"
-    }
-  ],
-  "r2_buckets": [
-    {
-      "binding": "SITE_IMAGES",
-      "bucket_name": "jump-rope-site-images"
-    },
-    {
-      "binding": "NEXT_INC_CACHE_R2_BUCKET",
-      "bucket_name": "jump-rope-b2b-site-opennext-cache"
+      "service": "fitgearoem"
     }
   ],
   "images": {
@@ -35,7 +19,7 @@
   },
   "vars": {
     "NEXT_PUBLIC_WHATSAPP_NUMBER": "15551234567",
-    "NEXT_PUBLIC_SITE_URL": "https://jump-rope-b2b-site.YOUR_WORKERS_SUBDOMAIN.workers.dev",
+    "NEXT_PUBLIC_SITE_URL": "https://fitgearoem.YOUR_WORKERS_SUBDOMAIN.workers.dev",
     "DEEPSEEK_MODEL": "deepseek-chat",
     "CLOUDFLARE_R2_PUBLIC_URL": "https://YOUR_PUBLIC_R2_DOMAIN"
   }
