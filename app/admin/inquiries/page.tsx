@@ -3,7 +3,7 @@ import { LogOut } from "lucide-react";
 import { StatusSelect } from "@/components/StatusSelect";
 import { TranslateMessageButton } from "@/components/TranslateMessageButton";
 import { isAdminAuthenticated } from "@/lib/auth";
-import { getInquiryStoreLabel, hasDatabaseUrl, listInquiries } from "@/lib/inquiry-store";
+import { getInquiryStoreInfo, listInquiries } from "@/lib/inquiry-store";
 import { inquiryStatusLabels, isInquiryStatus } from "@/lib/site-data";
 
 export const dynamic = "force-dynamic";
@@ -13,7 +13,7 @@ export default async function AdminInquiriesPage() {
     redirect("/admin/login");
   }
 
-  const usingDatabase = hasDatabaseUrl();
+  const storeInfo = await getInquiryStoreInfo();
   const inquiries = await listInquiries();
 
   return (
@@ -24,7 +24,7 @@ export default async function AdminInquiriesPage() {
             <p className="eyebrow">管理后台</p>
             <h1 className="mt-3 text-4xl font-semibold text-ink">批发询盘管理</h1>
             <p className="mt-2 text-sm text-graphite">
-              共 {inquiries.length} 条询盘 · {getInquiryStoreLabel()}
+              共 {inquiries.length} 条询盘 · {storeInfo.label}
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -44,11 +44,11 @@ export default async function AdminInquiriesPage() {
         </div>
 
         <div className="mt-8 grid gap-4">
-          {!usingDatabase ? (
+          {storeInfo.isLocalDemo ? (
             <div className="rounded-[8px] border border-ocean/20 bg-white p-5 text-graphite">
               <h2 className="text-lg font-semibold text-ink">本地演示模式</h2>
               <p className="mt-2 text-sm leading-6">
-                当前没有配置 `DATABASE_URL`，询盘会先保存到本地 `.data/inquiries.json`。正式上线时再接 PostgreSQL 数据库。
+                当前没有检测到 Cloudflare KV、Cloudflare R2 或 PostgreSQL，询盘会保存到本地 `.data/inquiries.json`。
               </p>
             </div>
           ) : null}

@@ -30,7 +30,39 @@ export function hasDatabaseUrl() {
 }
 
 export function getInquiryStoreLabel() {
-  return hasDatabaseUrl() ? "PostgreSQL 数据库" : "Cloudflare KV 或本地演示存储";
+  if (hasDatabaseUrl()) return "PostgreSQL 数据库";
+  if (hasR2DataStoreConfig()) return "Cloudflare R2 存储";
+  return "Cloudflare KV 或本地演示存储";
+}
+
+export async function getInquiryStoreInfo() {
+  const kv = await getSiteDataKv();
+
+  if (kv) {
+    return {
+      label: "Cloudflare KV 存储",
+      isLocalDemo: false
+    };
+  }
+
+  if (hasR2DataStoreConfig()) {
+    return {
+      label: "Cloudflare R2 存储",
+      isLocalDemo: false
+    };
+  }
+
+  if (hasDatabaseUrl()) {
+    return {
+      label: "PostgreSQL 数据库",
+      isLocalDemo: false
+    };
+  }
+
+  return {
+    label: "本地演示存储",
+    isLocalDemo: true
+  };
 }
 
 export async function createInquiry(data: InquiryPayload) {
