@@ -15,6 +15,12 @@
       "service": "fitgearoem"
     }
   ],
+  "kv_namespaces": [
+    {
+      "binding": "SITE_DATA",
+      "id": "4b6ef03aa64a4b78951d3f2bfbbd6489"
+    }
+  ],
   "images": {
     "binding": "IMAGES"
   },
