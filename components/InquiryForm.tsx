@@ -12,10 +12,11 @@ export function InquiryForm() {
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const form = event.currentTarget;
     setState("submitting");
     setMessage("");
 
-    const formData = new FormData(event.currentTarget);
+    const formData = new FormData(form);
     const payload = Object.fromEntries(formData.entries());
 
     try {
@@ -30,7 +31,7 @@ export function InquiryForm() {
         throw new Error(result.message || "Submission failed.");
       }
 
-      event.currentTarget.reset();
+      form.reset();
       setState("success");
       setMessage("Thank you. We have received your inquiry. You can also contact us directly on WhatsApp for a faster quote.");
     } catch (error) {
