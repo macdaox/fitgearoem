@@ -153,6 +153,105 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
         </div>
       </Section>
 
+      <Section title="关于我们页面">
+        <div className="grid gap-4">
+          <TextField label="页面小标题" value={content.about.eyebrow} onChange={(value) => setDeepValue("about.eyebrow", value)} />
+          <TextField label="页面主标题" value={content.about.title} onChange={(value) => setDeepValue("about.title", value)} />
+          <TextareaField label="页面描述" value={content.about.description} onChange={(value) => setDeepValue("about.description", value)} />
+          <ImageField label="页面 Hero 图片" value={content.about.heroImage} onChange={(url) => updateImage("about.heroImage", url)} />
+          <TextField
+            label="Hero 图片裁切位置"
+            value={content.about.imagePosition}
+            onChange={(value) => setDeepValue("about.imagePosition", value)}
+            hint="例如 50% 50%，第一个值是左右位置，第二个值是上下位置。"
+          />
+          <TextField label="Hero 主按钮文字" value={content.about.primaryCta} onChange={(value) => setDeepValue("about.primaryCta", value)} />
+          <TextField label="Hero 次按钮文字" value={content.about.secondaryCta} onChange={(value) => setDeepValue("about.secondaryCta", value)} />
+          <TextField label="介绍区小标题" value={content.about.introEyebrow} onChange={(value) => setDeepValue("about.introEyebrow", value)} />
+          <TextField label="介绍区标题" value={content.about.introTitle} onChange={(value) => setDeepValue("about.introTitle", value)} />
+          <TextareaField label="介绍区正文" value={content.about.introText} onChange={(value) => setDeepValue("about.introText", value)} />
+          <TextField
+            label="能力模块小标题"
+            value={content.about.capabilitiesEyebrow}
+            onChange={(value) => setDeepValue("about.capabilitiesEyebrow", value)}
+          />
+          <TextField
+            label="能力模块标题"
+            value={content.about.capabilitiesTitle}
+            onChange={(value) => setDeepValue("about.capabilitiesTitle", value)}
+          />
+          <TextField label="工厂/服务区小标题" value={content.about.factoryEyebrow} onChange={(value) => setDeepValue("about.factoryEyebrow", value)} />
+          <TextField label="工厂/服务区标题" value={content.about.factoryTitle} onChange={(value) => setDeepValue("about.factoryTitle", value)} />
+          <TextareaField label="工厂/服务区正文" value={content.about.factoryText} onChange={(value) => setDeepValue("about.factoryText", value)} />
+          <ImageField label="工厂/服务区图片" value={content.about.factoryImage} onChange={(url) => updateImage("about.factoryImage", url)} />
+          <TextareaField
+            label="流程步骤"
+            value={content.about.processSteps.join("\n")}
+            onChange={(value) =>
+              setContent((current) => ({
+                ...current,
+                about: {
+                  ...current.about,
+                  processSteps: parseLines(value)
+                }
+              }))
+            }
+            hint="每行一个步骤。"
+          />
+          <TextareaField
+            label="数据亮点"
+            value={content.about.stats.map((item) => `${item.value} | ${item.label}`).join("\n")}
+            onChange={(value) =>
+              setContent((current) => ({
+                ...current,
+                about: {
+                  ...current.about,
+                  stats: parseStats(value)
+                }
+              }))
+            }
+            hint="每行一个，格式：数值 | 说明。例如：OEM | Logo, color and packaging support"
+          />
+          <TextareaField
+            label="能力模块"
+            value={content.about.capabilities.map((item) => `${item.title} | ${item.description}`).join("\n")}
+            onChange={(value) =>
+              setContent((current) => ({
+                ...current,
+                about: {
+                  ...current.about,
+                  capabilities: parseCapabilities(value)
+                }
+              }))
+            }
+            hint="每行一个，格式：标题 | 描述。"
+          />
+          <TextField label="价值点小标题" value={content.about.valuesEyebrow} onChange={(value) => setDeepValue("about.valuesEyebrow", value)} />
+          <TextField label="价值点标题" value={content.about.valuesTitle} onChange={(value) => setDeepValue("about.valuesTitle", value)} />
+          <TextareaField
+            label="价值点"
+            value={content.about.values.join("\n")}
+            onChange={(value) =>
+              setContent((current) => ({
+                ...current,
+                about: {
+                  ...current.about,
+                  values: value
+                    .split("\n")
+                    .map((item) => item.trim())
+                    .filter(Boolean)
+                }
+              }))
+            }
+            hint="每行一个价值点。"
+          />
+          <TextField label="底部 CTA 小标题" value={content.about.ctaEyebrow} onChange={(value) => setDeepValue("about.ctaEyebrow", value)} />
+          <TextField label="底部 CTA 标题" value={content.about.ctaTitle} onChange={(value) => setDeepValue("about.ctaTitle", value)} />
+          <TextareaField label="底部 CTA 描述" value={content.about.ctaDescription} onChange={(value) => setDeepValue("about.ctaDescription", value)} />
+          <TextField label="底部 CTA 按钮文字" value={content.about.ctaButton} onChange={(value) => setDeepValue("about.ctaButton", value)} />
+        </div>
+      </Section>
+
       <div className="sticky bottom-4 z-20 flex flex-col gap-3 rounded-[8px] border border-line bg-white/90 p-4 shadow-soft backdrop-blur sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-graphite">{message || "修改后点击保存，前台会读取最新内容。"}</p>
         <button
@@ -167,6 +266,43 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
       </div>
     </div>
   );
+}
+
+function parseStats(value: string) {
+  return value
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const [statValue, ...labelParts] = line.split("|");
+      return {
+        value: statValue.trim(),
+        label: labelParts.join("|").trim()
+      };
+    })
+    .filter((item) => item.value && item.label);
+}
+
+function parseCapabilities(value: string) {
+  return value
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const [title, ...descriptionParts] = line.split("|");
+      return {
+        title: title.trim(),
+        description: descriptionParts.join("|").trim()
+      };
+    })
+    .filter((item) => item.title && item.description);
+}
+
+function parseLines(value: string) {
+  return value
+    .split("\n")
+    .map((item) => item.trim())
+    .filter(Boolean);
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {

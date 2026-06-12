@@ -42,6 +42,40 @@ export type SiteContent = {
     title: string;
     description: string;
   };
+  about: {
+    eyebrow: string;
+    title: string;
+    description: string;
+    heroImage: string;
+    imagePosition: string;
+    primaryCta: string;
+    secondaryCta: string;
+    introEyebrow: string;
+    introTitle: string;
+    introText: string;
+    capabilitiesEyebrow: string;
+    capabilitiesTitle: string;
+    factoryEyebrow: string;
+    factoryTitle: string;
+    factoryText: string;
+    factoryImage: string;
+    processSteps: string[];
+    valuesEyebrow: string;
+    valuesTitle: string;
+    stats: Array<{
+      value: string;
+      label: string;
+    }>;
+    capabilities: Array<{
+      title: string;
+      description: string;
+    }>;
+    values: string[];
+    ctaEyebrow: string;
+    ctaTitle: string;
+    ctaDescription: string;
+    ctaButton: string;
+  };
 };
 
 const contentPath = path.join(process.cwd(), ".data", "site-content.json");
@@ -110,6 +144,54 @@ export const defaultSiteContent: SiteContent = {
     eyebrow: "Wholesale Inquiry",
     title: "Get wholesale quote.",
     description: "Share your product interest, quantity and customization needs. Our sales team will prepare a focused quote."
+  },
+  about: {
+    eyebrow: "About Us",
+    title: "Fitness supply built for brands that move fast.",
+    description:
+      "We support overseas buyers with custom jump ropes, recovery tools, OEM packaging and export-ready production coordination.",
+    heroImage: "/images/training-set.jpg",
+    imagePosition: "50% 50%",
+    primaryCta: "Start a Project",
+    secondaryCta: "WhatsApp",
+    introEyebrow: "Who We Are",
+    introTitle: "A practical manufacturing partner for fitness products.",
+    introText:
+      "Our work focuses on helping fitness brands, importers, gyms and online retailers build reliable product programs. From product selection and sampling to color matching, logo placement, packaging and shipment preparation, we keep the process clear and production-focused.",
+    capabilitiesEyebrow: "Capabilities",
+    capabilitiesTitle: "Designed around practical wholesale workflows.",
+    factoryEyebrow: "How We Work",
+    factoryTitle: "From sample to repeat orders.",
+    factoryText:
+      "We combine product development support with stable factory coordination, helping buyers move from a first sample to bulk production with fewer surprises. Each order can be adjusted around market positioning, target price, packaging format and delivery schedule.",
+    factoryImage: "/images/oem-colors.png",
+    processSteps: ["Sample confirmation", "Bulk production details", "Export-ready shipment"],
+    valuesEyebrow: "Our Standard",
+    valuesTitle: "Simple principles for long-term B2B work.",
+    stats: [
+      { value: "OEM", label: "Logo, color and packaging support" },
+      { value: "B2B", label: "Built for wholesale buyers" },
+      { value: "Global", label: "Export-ready communication" }
+    ],
+    capabilities: [
+      {
+        title: "Product sourcing and development",
+        description: "Jump ropes, fitness accessories and recovery products selected around your target market."
+      },
+      {
+        title: "Private-label customization",
+        description: "Custom colors, logo placement, packaging, gift boxes and retail-ready sets."
+      },
+      {
+        title: "Sampling and production follow-up",
+        description: "Clear sample confirmation, bulk order details and export coordination."
+      }
+    ],
+    values: ["Clear communication", "Stable quality control", "Flexible OEM options", "Export-minded service"],
+    ctaEyebrow: "Wholesale Inquiry",
+    ctaTitle: "Build your next fitness product line with us.",
+    ctaDescription: "Tell us your product direction, quantity and customization needs. We will help turn it into a practical supply plan.",
+    ctaButton: "Send Inquiry"
   }
 };
 
@@ -164,7 +246,15 @@ function mergeContent(defaults: SiteContent, value: Partial<SiteContent>): SiteC
       ...value.oem,
       options: value.oem?.options?.length ? value.oem.options : defaults.oem.options
     },
-    inquiry: { ...defaults.inquiry, ...value.inquiry }
+    inquiry: { ...defaults.inquiry, ...value.inquiry },
+    about: {
+      ...defaults.about,
+      ...value.about,
+      stats: normalizeObjectList(value.about?.stats, defaults.about.stats),
+      capabilities: normalizeObjectList(value.about?.capabilities, defaults.about.capabilities),
+      processSteps: value.about?.processSteps?.length ? value.about.processSteps : defaults.about.processSteps,
+      values: value.about?.values?.length ? value.about.values : defaults.about.values
+    }
   };
 }
 
@@ -172,5 +262,13 @@ function normalizeDetails(value: SiteContent["productDetails"] | undefined, defa
   return defaults.map((item, index) => ({
     ...item,
     ...(value?.[index] || {})
+  }));
+}
+
+function normalizeObjectList<T extends Record<string, string>>(value: T[] | undefined, defaults: T[]) {
+  if (!value?.length) return defaults;
+  return value.map((item, index) => ({
+    ...(defaults[index] || defaults[0]),
+    ...item
   }));
 }

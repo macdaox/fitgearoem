@@ -19,7 +19,7 @@ export default async function AdminContentPage() {
           <div>
             <p className="eyebrow">管理后台</p>
             <h1 className="mt-3 text-4xl font-semibold text-ink">网站内容管理</h1>
-            <p className="mt-2 text-sm text-graphite">维护首页图片、文案、联系方式和 OEM 内容。</p>
+            <p className="mt-2 text-sm text-graphite">维护首页、关于我们、联系方式和 OEM 内容。</p>
           </div>
           <a
             href="/admin/inquiries"

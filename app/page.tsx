@@ -45,10 +45,13 @@ function Header({ content }: { content: SiteContent }) {
   return (
     <header className="fixed left-0 right-0 top-4 z-50 px-4 sm:top-5">
       <nav className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between rounded-full border border-white/55 bg-white/38 px-4 shadow-[0_18px_60px_rgba(40,64,90,0.16)] backdrop-blur-2xl backdrop-saturate-150 sm:px-5">
-        <a href="#" className="rounded-full px-2 text-sm font-bold text-ink transition hover:bg-white/35">
+        <a href="/" className="rounded-full px-2 text-sm font-bold text-ink transition hover:bg-white/35">
           {content.brand.name}
         </a>
         <div className="hidden items-center rounded-full border border-white/45 bg-white/24 px-2 py-1 text-sm font-medium text-graphite shadow-inner shadow-white/20 md:flex">
+          <a href="/about" className="rounded-full px-4 py-2 transition hover:bg-white/55 hover:text-ink">
+            About Us
+          </a>
           <a href="#products" className="rounded-full px-4 py-2 transition hover:bg-white/55 hover:text-ink">
             Products
           </a>
@@ -392,6 +395,9 @@ function Footer({ content }: { content: SiteContent }) {
           </a>
           <a href="#inquiry" className="hover:text-ink">
             Wholesale Inquiry
+          </a>
+          <a href="/about" className="hover:text-ink">
+            About Us
           </a>
           <a href={content.brand.tiktok} className="hover:text-ink">
             TikTok

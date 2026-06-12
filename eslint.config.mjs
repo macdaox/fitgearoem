@@ -22,6 +22,11 @@ const eslintConfig = [
   },
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
+    rules: {
+      "@next/next/no-html-link-for-pages": "off"
+    }
+  },
+  {
     ignores: [
       ".next/**",
       ".open-next/**",
