@@ -70,6 +70,7 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
           <TextField label="WhatsApp 号码" value={content.brand.whatsapp} onChange={(value) => setDeepValue("brand.whatsapp", value)} />
           <TextField label="Instagram 链接" value={content.brand.instagram} onChange={(value) => setDeepValue("brand.instagram", value)} />
           <TextField label="TikTok 链接" value={content.brand.tiktok} onChange={(value) => setDeepValue("brand.tiktok", value)} />
+          <TextField label="Facebook 链接" value={content.brand.facebook} onChange={(value) => setDeepValue("brand.facebook", value)} />
         </div>
       </Section>
 

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import type { ReactNode } from "react";
 import { ArrowDown, BadgeCheck, Cable, ChevronRight, Mail, MessageCircle, PackageCheck, Rotate3D, ShieldCheck, Truck, Zap } from "lucide-react";
 import { InquiryForm } from "@/components/InquiryForm";
 import { ScrollAnimations } from "@/components/ScrollAnimations";
@@ -355,19 +356,42 @@ function InquirySection({ content }: { content: SiteContent }) {
               <Mail size={18} />
               {content.brand.email}
             </a>
-            <a
-              href={getWhatsAppHref(undefined, content.brand.whatsapp)}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-2 transition hover:text-ink"
-            >
-              <MessageCircle size={18} />
-              WhatsApp faster quote
-            </a>
+            <div className="group relative w-fit">
+              <a
+                href={getWhatsAppHref(undefined, content.brand.whatsapp)}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 transition hover:text-ink"
+              >
+                <MessageCircle size={18} />
+                WhatsApp faster quote
+              </a>
+              <div className="pointer-events-none absolute left-0 top-full z-20 mt-3 w-44 translate-y-2 rounded-[8px] border border-line bg-white p-3 opacity-0 shadow-soft transition group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:translate-y-0 group-focus-within:opacity-100">
+                <Image
+                  src={getQrCodeUrl(getWhatsAppHref(undefined, content.brand.whatsapp))}
+                  width={160}
+                  height={160}
+                  alt="WhatsApp QR code"
+                  className="aspect-square w-full rounded-[8px]"
+                />
+                <p className="mt-2 text-center text-xs font-medium text-graphite">Scan to chat on WhatsApp</p>
+              </div>
+            </div>
             <span className="inline-flex items-center gap-2">
               <Truck size={18} />
               Global shipping support
             </span>
+          </div>
+          <div className="mt-7 flex items-center gap-3">
+            <SocialLink href={content.brand.tiktok} label="TikTok">
+              <TikTokIcon />
+            </SocialLink>
+            <SocialLink href={content.brand.instagram} label="Instagram">
+              <InstagramIcon />
+            </SocialLink>
+            <SocialLink href={content.brand.facebook} label="Facebook">
+              <FacebookIcon />
+            </SocialLink>
           </div>
         </div>
         <div className="reveal">
@@ -375,6 +399,53 @@ function InquirySection({ content }: { content: SiteContent }) {
         </div>
       </div>
     </section>
+  );
+}
+
+function SocialLink({ href, label, children }: { href: string; label: string; children: ReactNode }) {
+  if (!href) return null;
+
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      aria-label={label}
+      title={label}
+      className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-line bg-white text-graphite shadow-soft transition hover:-translate-y-0.5 hover:border-ink hover:text-ink"
+    >
+      {children}
+    </a>
+  );
+}
+
+function getQrCodeUrl(value: string) {
+  return `https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=10&data=${encodeURIComponent(value)}`;
+}
+
+function TikTokIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5" fill="currentColor">
+      <path d="M16.7 3c.3 2.2 1.6 3.8 3.8 4v3.1a7.4 7.4 0 0 1-3.7-1.1v5.7c0 3.7-2.5 6.3-6 6.3A5.8 5.8 0 0 1 5 15.2c0-3.3 2.6-5.8 5.9-5.8.4 0 .8 0 1.1.1v3.3a3 3 0 0 0-1.2-.2 2.5 2.5 0 0 0-2.6 2.6 2.5 2.5 0 0 0 2.5 2.5c1.6 0 2.6-1 2.6-2.9V3h3.4Z" />
+    </svg>
+  );
+}
+
+function InstagramIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
+      <rect x="4" y="4" width="16" height="16" rx="4" />
+      <circle cx="12" cy="12" r="3.5" />
+      <path d="M17.4 6.6h.01" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function FacebookIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5" fill="currentColor">
+      <path d="M14.3 8.4V6.9c0-.7.5-.9 1-.9h1.8V3.1c-.3 0-1.5-.1-2.8-.1-2.8 0-4.7 1.7-4.7 4.8v.6H6.9v3.2h2.7V21h3.5v-9.4h2.9l.5-3.2h-3.4Z" />
+    </svg>
   );
 }
 

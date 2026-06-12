@@ -12,6 +12,7 @@ export type SiteContent = {
     whatsapp: string;
     instagram: string;
     tiktok: string;
+    facebook: string;
   };
   hero: {
     eyebrow: string;
@@ -88,7 +89,8 @@ export const defaultSiteContent: SiteContent = {
     email: "sales@example.com",
     whatsapp: "15551234567",
     instagram: "https://instagram.com/",
-    tiktok: "https://www.tiktok.com/"
+    tiktok: "https://www.tiktok.com/",
+    facebook: "https://www.facebook.com/"
   },
   hero: {
     eyebrow: "Wholesale Jump Rope Manufacturer",
