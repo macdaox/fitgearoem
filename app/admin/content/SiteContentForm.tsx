@@ -362,10 +362,11 @@ function ImageField({ label, value, onChange }: { label: string; value: string; 
     setUploading(true);
     setMessage("");
 
-    const formData = new FormData();
-    formData.append("file", file);
-
     try {
+      const uploadFile = await compressImageForUpload(file);
+      const formData = new FormData();
+      formData.append("file", uploadFile);
+
       const response = await fetch("/api/admin/upload", {
         method: "POST",
         body: formData
@@ -377,7 +378,11 @@ function ImageField({ label, value, onChange }: { label: string; value: string; 
       }
 
       onChange(result.url);
-      setMessage(result.storage === "cloudflare-r2" ? "已上传到 Cloudflare R2。" : "已保存到本地 uploads。");
+      const sizeNote =
+        uploadFile.size < file.size
+          ? ` 已压缩：${formatFileSize(file.size)} -> ${formatFileSize(uploadFile.size)}。`
+          : ` 文件大小：${formatFileSize(uploadFile.size)}。`;
+      setMessage(`${result.storage === "cloudflare-r2" ? "已上传到 Cloudflare R2。" : "已保存到本地 uploads。"}${sizeNote}`);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "上传失败。");
     } finally {
@@ -419,4 +424,59 @@ function ImageField({ label, value, onChange }: { label: string; value: string; 
       {message ? <span className="text-xs font-normal text-graphite">{message}</span> : null}
     </div>
   );
+}
+
+async function compressImageForUpload(file: File) {
+  if (!file.type.startsWith("image/") || file.type === "image/svg+xml" || file.type === "image/gif") {
+    return file;
+  }
+
+  const image = await createImageBitmap(file);
+  const maxDimension = 2400;
+  const scale = Math.min(1, maxDimension / Math.max(image.width, image.height));
+  const width = Math.max(1, Math.round(image.width * scale));
+  const height = Math.max(1, Math.round(image.height * scale));
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+
+  const context = canvas.getContext("2d", {
+    alpha: file.type === "image/png"
+  });
+
+  if (!context) {
+    image.close();
+    return file;
+  }
+
+  context.drawImage(image, 0, 0, width, height);
+  image.close();
+
+  const webpBlob = await canvasToBlob(canvas, "image/webp", 0.82);
+  const outputBlob = webpBlob || (await canvasToBlob(canvas, "image/jpeg", 0.84));
+
+  if (!outputBlob || outputBlob.size >= file.size) {
+    return file;
+  }
+
+  const extension = outputBlob.type === "image/webp" ? "webp" : "jpg";
+  const baseName = file.name.replace(/\.[^.]+$/, "") || "image";
+  return new File([outputBlob], `${baseName}-compressed.${extension}`, {
+    type: outputBlob.type,
+    lastModified: Date.now()
+  });
+}
+
+function canvasToBlob(canvas: HTMLCanvasElement, type: string, quality: number) {
+  return new Promise<Blob | null>((resolve) => {
+    canvas.toBlob(resolve, type, quality);
+  });
+}
+
+function formatFileSize(bytes: number) {
+  if (bytes < 1024 * 1024) {
+    return `${Math.max(1, Math.round(bytes / 1024))}KB`;
+  }
+
+  return `${(bytes / 1024 / 1024).toFixed(1)}MB`;
 }
