@@ -118,7 +118,7 @@ function Hero({ content }: { content: SiteContent }) {
       <div className="absolute inset-0 bg-gradient-to-r from-white/96 via-white/72 to-white/8" />
       <div className="absolute inset-0 bg-gradient-to-t from-white/55 via-transparent to-white/25" />
 
-      <div className="section-shell relative z-10 flex min-h-screen items-end pb-10 pt-28 sm:pb-14 lg:pb-20">
+      <div className="section-shell relative z-10 flex min-h-screen items-end pb-20 pt-28 sm:pb-24 lg:pb-32">
         <div className="reveal max-w-3xl text-ink">
           <p className="eyebrow">{content.hero.eyebrow}</p>
           <h1 className="mt-5 max-w-4xl text-5xl font-semibold leading-[1.02] text-ink sm:text-7xl lg:text-8xl">
@@ -149,18 +149,18 @@ function Hero({ content }: { content: SiteContent }) {
 
 function HomeStats({ content }: { content: SiteContent }) {
   return (
-    <section className="relative z-10 -mt-12 pb-0 sm:-mt-16 lg:-mt-20">
+    <section className="relative z-20 bg-white py-10 sm:py-12 lg:py-14">
       <div className="section-shell">
-        <div className="overflow-hidden rounded-[8px] border border-white/70 bg-white/88 shadow-[0_22px_70px_rgba(40,64,90,0.14)] backdrop-blur-2xl">
-          <div className="grid grid-cols-2 divide-x-0 divide-y divide-line/70 sm:grid-cols-3 lg:grid-cols-6 lg:divide-x lg:divide-y-0">
+        <div className="mx-auto max-w-7xl rounded-[8px] border border-white/80 bg-white/92 p-4 shadow-[0_18px_46px_rgba(40,64,90,0.11)] backdrop-blur-2xl sm:p-5 lg:p-6">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-6 lg:gap-6">
             {content.homeStats.items.map((item, index) => {
               const Icon = homeIcons[item.icon] || BadgeCheck;
               return (
-                <div key={`${item.label}-${index}`} className="flex min-h-36 flex-col items-center justify-center px-4 py-6 text-center">
+                <div key={`${item.label}-${index}`} className="flex min-h-32 flex-col items-center justify-center rounded-[8px] px-4 py-5 text-center">
                   <div className="flex h-11 w-11 items-center justify-center rounded-[8px] bg-mist text-ocean">
                     <Icon size={24} strokeWidth={1.8} />
                   </div>
-                  <p className="mt-4 text-2xl font-semibold leading-none text-ink">{item.value}</p>
+                  <p className="mt-4 text-2xl font-semibold leading-none text-ink lg:text-[1.7rem]">{item.value}</p>
                   <p className="mt-2 text-sm font-medium leading-5 text-graphite">{item.label}</p>
                 </div>
               );
@@ -174,7 +174,7 @@ function HomeStats({ content }: { content: SiteContent }) {
 
 function ProductDetails({ content }: { content: SiteContent }) {
   return (
-    <section className="bg-white pt-16">
+    <section className="relative z-10 bg-white">
       <div>
         <ProductDetailsCarousel items={content.productDetails} />
       </div>
@@ -184,7 +184,7 @@ function ProductDetails({ content }: { content: SiteContent }) {
 
 function WholesaleTrust() {
   return (
-    <section className="bg-mist py-20 sm:py-28">
+    <section className="bg-mist py-24 sm:py-32">
       <div className="section-shell">
         <div className="reveal flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div>
@@ -217,7 +217,7 @@ function WholesaleTrust() {
 
 function OemModule({ content }: { content: SiteContent }) {
   return (
-    <section id="oem" className="relative min-h-screen overflow-hidden bg-ink py-20 sm:py-28">
+    <section id="oem" className="relative min-h-screen overflow-hidden bg-ink py-24 sm:py-32">
       <Image
         src={content.oem.image}
         width={1672}
@@ -249,7 +249,7 @@ function OemModule({ content }: { content: SiteContent }) {
 
 function ProductSeries() {
   return (
-    <section id="products" className="bg-mist py-20 sm:py-28">
+    <section id="products" className="bg-mist py-24 sm:py-32">
       <div className="section-shell">
         <div className="reveal max-w-3xl">
           <p className="eyebrow">Product Series</p>
@@ -294,7 +294,7 @@ function ProductSeries() {
 
 function TrainingScenes() {
   return (
-    <section className="bg-ink py-20 text-white sm:py-28">
+    <section className="bg-ink py-24 text-white sm:py-32">
       <div className="section-shell grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
         <div className="reveal">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-volt">Training Scenes</p>
@@ -326,7 +326,7 @@ function TrainingScenes() {
 
 function Specifications() {
   return (
-    <section id="specs" className="bg-white py-20 sm:py-28">
+    <section id="specs" className="bg-white py-24 sm:py-32">
       <div className="section-shell grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
         <div className="reveal">
           <p className="eyebrow">Specifications</p>
@@ -354,19 +354,22 @@ function Specifications() {
 
 function ServiceProcess({ content }: { content: SiteContent }) {
   return (
-    <section className="bg-mist py-20 sm:py-24">
+    <section className="bg-white py-20 sm:py-24">
       <div className="section-shell">
         <div className="reveal mx-auto max-w-3xl text-center">
-          <h2 className="text-3xl font-semibold leading-tight text-ink sm:text-5xl">{content.serviceProcess.title}</h2>
+          <h2 className="text-2xl font-bold uppercase leading-tight tracking-[0.02em] text-ink sm:text-3xl">
+            {content.serviceProcess.title}
+          </h2>
+          <div className="mx-auto mt-3 h-1 w-20 rounded-full bg-ocean" />
         </div>
 
-        <div className="mt-12 hidden grid-cols-[minmax(0,1fr)_3rem_minmax(0,1fr)_3rem_minmax(0,1fr)_3rem_minmax(0,1fr)_3rem_minmax(0,1fr)] items-center gap-4 lg:grid">
+        <div className="mt-12 hidden grid-cols-[minmax(0,1fr)_4rem_minmax(0,1fr)_4rem_minmax(0,1fr)_4rem_minmax(0,1fr)_4rem_minmax(0,1fr)] items-start gap-2 lg:grid">
           {content.serviceProcess.steps.map((step, index) => (
             <div key={`${step.number}-${step.title}`} className="contents">
               <ProcessStep step={step} />
               {index < content.serviceProcess.steps.length - 1 ? (
-                <div className="flex h-64 items-center justify-center text-ocean">
-                  <ArrowRight size={24} strokeWidth={1.8} />
+                <div className="flex h-20 items-center justify-center pt-1 text-ocean">
+                  <ArrowRight size={28} strokeWidth={2.2} />
                 </div>
               ) : null}
             </div>
@@ -400,27 +403,27 @@ function ProcessStep({
 
   return (
     <article
-      className={`reveal flex flex-col rounded-[8px] border border-line bg-white p-5 shadow-soft ${
-        align === "center" ? "h-64 flex-1 items-center justify-center text-center" : "text-left"
+      className={`reveal flex flex-col ${
+        align === "center" ? "min-h-48 items-center text-center" : "text-left"
       }`}
     >
       <div
-        className={`flex h-12 w-12 items-center justify-center rounded-[8px] border border-line bg-mist text-ocean ${
+        className={`flex h-16 w-16 items-center justify-center text-ocean ${
           align === "center" ? "mx-auto" : ""
         }`}
       >
-        <Icon size={24} strokeWidth={1.8} />
+        <Icon size={46} strokeWidth={1.9} />
       </div>
-      <p className="mt-4 text-xs font-semibold uppercase tracking-[0.16em] text-ocean">{step.number}</p>
-      <h3 className="mt-2 text-lg font-semibold text-ink">{step.title}</h3>
-      <p className="mt-3 text-sm leading-6 text-graphite">{step.description}</p>
+      <p className="mt-3 text-lg font-bold leading-none text-ink">{step.number}</p>
+      <h3 className="mt-1 text-sm font-bold text-ink">{step.title}</h3>
+      <p className="mt-5 max-w-56 text-sm leading-6 text-graphite">{step.description}</p>
     </article>
   );
 }
 
 function InquirySection({ content }: { content: SiteContent }) {
   return (
-    <section id="inquiry" className="bg-mist py-20 sm:py-28">
+    <section id="inquiry" className="bg-mist py-24 sm:py-32">
       <div className="section-shell grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
         <div className="reveal">
           <p className="eyebrow">{content.inquiry.eyebrow}</p>
@@ -525,34 +528,131 @@ function FacebookIcon() {
 }
 
 function Footer({ content }: { content: SiteContent }) {
+  const quickLinks = [
+    { label: "Home", href: "/" },
+    { label: "About Us", href: "/about" },
+    { label: "Products", href: "#products" },
+    { label: "OEM/ODM", href: "#oem" },
+    { label: "Specifications", href: "#specs" },
+    { label: "Contact Us", href: "#inquiry" }
+  ];
+
   return (
-    <footer className="bg-white py-10">
-      <div className="section-shell flex flex-col gap-6 border-t border-line pt-8 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="text-sm font-bold text-ink">{content.brand.name}</p>
-          <p className="mt-2 text-sm text-graphite">Professional jump ropes for wholesale and OEM buyers.</p>
+    <footer className="relative overflow-hidden bg-ink text-white">
+      <Image
+        src="/images/training-set.jpg"
+        width={1600}
+        height={900}
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 h-full w-full object-cover opacity-[0.18]"
+      />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#071016]/96 via-[#071016]/92 to-[#071016]/96" />
+      <div className="absolute inset-x-0 top-0 h-px bg-white/12" />
+
+      <div className="section-shell relative z-10 py-14 sm:py-16">
+        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-[1.45fr_0.9fr_1fr_1.5fr_1.35fr]">
+          <div>
+            <a href="/" className="text-2xl font-black uppercase italic tracking-tight text-white sm:text-3xl">
+              {content.brand.name}
+            </a>
+            <p className="mt-6 max-w-sm text-sm leading-7 text-white/68">
+              {content.brand.name} is a professional OEM/ODM supplier for jump ropes, fitness accessories and wholesale private-label programs.
+            </p>
+            <div className="mt-7 flex items-center gap-3">
+              <FooterSocialLink href={content.brand.facebook} label="Facebook">
+                <FacebookIcon />
+              </FooterSocialLink>
+              <FooterSocialLink href={content.brand.instagram} label="Instagram">
+                <InstagramIcon />
+              </FooterSocialLink>
+              <FooterSocialLink href={content.brand.tiktok} label="TikTok">
+                <TikTokIcon />
+              </FooterSocialLink>
+            </div>
+          </div>
+
+          <FooterColumn title="Quick Links">
+            {quickLinks.map((link) => (
+              <a key={link.label} href={link.href} className="footer-link">
+                {link.label}
+              </a>
+            ))}
+          </FooterColumn>
+
+          <FooterColumn title="Products">
+            {products.map((product) => (
+              <a key={product.name} href="#products" className="footer-link">
+                {product.name}
+              </a>
+            ))}
+          </FooterColumn>
+
+          <FooterColumn title="Contact Us">
+            <div className="grid gap-3 text-sm leading-6 text-white/70">
+              <a href={`mailto:${content.brand.email}`} className="transition hover:text-white">
+                Email: {content.brand.email}
+              </a>
+              <a href={getWhatsAppHref(undefined, content.brand.whatsapp)} target="_blank" rel="noreferrer" className="transition hover:text-white">
+                WhatsApp: {content.brand.whatsapp}
+              </a>
+              <p>OEM Service: Custom logo, color, packaging and bulk production support.</p>
+              <p>Global shipping support for wholesale buyers.</p>
+            </div>
+          </FooterColumn>
+
+          <FooterColumn title="Newsletter">
+            <p className="text-sm leading-6 text-white/70">Subscribe to get product updates and OEM supply notes.</p>
+            <form className="mt-5 grid gap-3">
+              <label className="sr-only" htmlFor="footer-email">
+                Email address
+              </label>
+              <input
+                id="footer-email"
+                type="email"
+                placeholder="Your email address"
+                className="h-11 rounded-[8px] border border-white/14 bg-white px-4 text-sm text-ink outline-none transition placeholder:text-graphite/70 focus:border-ocean"
+              />
+              <button
+                type="button"
+                className="h-11 rounded-[8px] bg-ocean px-5 text-sm font-bold uppercase tracking-[0.08em] text-white transition hover:bg-[#1671c9]"
+              >
+                Subscribe
+              </button>
+            </form>
+          </FooterColumn>
         </div>
-        <div className="flex flex-wrap gap-5 text-sm font-medium text-graphite">
-          <a href="#products" className="hover:text-ink">
-            Products
-          </a>
-          <a href="#oem" className="hover:text-ink">
-            OEM Service
-          </a>
-          <a href="#inquiry" className="hover:text-ink">
-            Wholesale Inquiry
-          </a>
-          <a href="/about" className="hover:text-ink">
-            About Us
-          </a>
-          <a href={content.brand.tiktok} className="hover:text-ink">
-            TikTok
-          </a>
-          <a href={content.brand.instagram} className="hover:text-ink">
-            Instagram
-          </a>
+
+        <div className="mt-12 border-t border-white/10 pt-6 text-center text-sm text-white/56">
+          © 2026 {content.brand.name}. All Rights Reserved.
         </div>
       </div>
     </footer>
+  );
+}
+
+function FooterColumn({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <div>
+      <h2 className="text-sm font-bold uppercase tracking-[0.08em] text-white">{title}</h2>
+      <div className="mt-6 grid gap-3 text-sm text-white/70">{children}</div>
+    </div>
+  );
+}
+
+function FooterSocialLink({ href, label, children }: { href: string; label: string; children: ReactNode }) {
+  if (!href) return null;
+
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      aria-label={label}
+      title={label}
+      className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/14 bg-white/8 text-white/82 transition hover:-translate-y-0.5 hover:border-ocean hover:bg-ocean hover:text-white"
+    >
+      {children}
+    </a>
   );
 }
