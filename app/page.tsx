@@ -23,6 +23,7 @@ import {
 import { InquiryForm } from "@/components/InquiryForm";
 import { ProductDetailsCarousel } from "@/components/ProductDetailsCarousel";
 import { ScrollAnimations } from "@/components/ScrollAnimations";
+import { TrackedLink } from "@/components/TrackedLink";
 import { getSiteContent, type HomeIconName, type SiteContent } from "@/lib/site-content";
 import {
   getWhatsAppHref,
@@ -430,20 +431,25 @@ function InquirySection({ content }: { content: SiteContent }) {
           <h2 className="mt-4 text-4xl font-semibold leading-tight text-ink sm:text-5xl">{content.inquiry.title}</h2>
           <p className="mt-5 max-w-lg text-base leading-7 text-graphite">{content.inquiry.description}</p>
           <div className="mt-8 flex flex-col gap-3 text-sm font-semibold text-graphite">
-            <a href={`mailto:${content.brand.email}`} className="inline-flex items-center gap-2 transition hover:text-ink">
+            <TrackedLink
+              href={`mailto:${content.brand.email}`}
+              eventProperties={{ contact_method: "email", location: "inquiry_section" }}
+              className="inline-flex items-center gap-2 transition hover:text-ink"
+            >
               <Mail size={18} />
               {content.brand.email}
-            </a>
+            </TrackedLink>
             <div className="group relative w-fit">
-              <a
+              <TrackedLink
                 href={getWhatsAppHref(undefined, content.brand.whatsapp)}
                 target="_blank"
                 rel="noreferrer"
+                eventProperties={{ contact_method: "whatsapp", location: "inquiry_section" }}
                 className="inline-flex items-center gap-2 transition hover:text-ink"
               >
                 <MessageCircle size={18} />
                 WhatsApp faster quote
-              </a>
+              </TrackedLink>
               <div className="pointer-events-none absolute left-0 top-full z-20 mt-3 w-44 translate-y-2 rounded-[8px] border border-line bg-white p-3 opacity-0 shadow-soft transition group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:translate-y-0 group-focus-within:opacity-100">
                 <Image
                   src={getQrCodeUrl(getWhatsAppHref(undefined, content.brand.whatsapp))}
@@ -484,16 +490,17 @@ function SocialLink({ href, label, children }: { href: string; label: string; ch
   if (!href) return null;
 
   return (
-    <a
+    <TrackedLink
       href={href}
       target="_blank"
       rel="noreferrer"
       aria-label={label}
       title={label}
+      eventProperties={{ contact_method: label.toLowerCase(), location: "inquiry_section" }}
       className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-line bg-white text-graphite shadow-soft transition hover:-translate-y-0.5 hover:border-ink hover:text-ink"
     >
       {children}
-    </a>
+    </TrackedLink>
   );
 }
 
@@ -590,12 +597,22 @@ function Footer({ content }: { content: SiteContent }) {
 
           <FooterColumn title="Contact Us">
             <div className="grid gap-3 text-sm leading-6 text-white/70">
-              <a href={`mailto:${content.brand.email}`} className="transition hover:text-white">
+              <TrackedLink
+                href={`mailto:${content.brand.email}`}
+                eventProperties={{ contact_method: "email", location: "footer" }}
+                className="transition hover:text-white"
+              >
                 Email: {content.brand.email}
-              </a>
-              <a href={getWhatsAppHref(undefined, content.brand.whatsapp)} target="_blank" rel="noreferrer" className="transition hover:text-white">
+              </TrackedLink>
+              <TrackedLink
+                href={getWhatsAppHref(undefined, content.brand.whatsapp)}
+                target="_blank"
+                rel="noreferrer"
+                eventProperties={{ contact_method: "whatsapp", location: "footer" }}
+                className="transition hover:text-white"
+              >
                 WhatsApp: {content.brand.whatsapp}
-              </a>
+              </TrackedLink>
               <p>OEM Service: Custom logo, color, packaging and bulk production support.</p>
               <p>Global shipping support for wholesale buyers.</p>
             </div>
@@ -644,15 +661,16 @@ function FooterSocialLink({ href, label, children }: { href: string; label: stri
   if (!href) return null;
 
   return (
-    <a
+    <TrackedLink
       href={href}
       target="_blank"
       rel="noreferrer"
       aria-label={label}
       title={label}
+      eventProperties={{ contact_method: label.toLowerCase(), location: "footer" }}
       className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/14 bg-white/8 text-white/82 transition hover:-translate-y-0.5 hover:border-ocean hover:bg-ocean hover:text-white"
     >
       {children}
-    </a>
+    </TrackedLink>
   );
 }

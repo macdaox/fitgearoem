@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { MessageCircle, Send } from "lucide-react";
+import { TrackedLink } from "@/components/TrackedLink";
 import { getWhatsAppHref, products } from "@/lib/site-data";
+import { trackTikTokEvent } from "@/lib/tiktok-events";
 
 type SubmitState = "idle" | "submitting" | "success" | "error";
 
@@ -30,6 +32,9 @@ export function InquiryForm() {
       if (!response.ok || !result.success) {
         throw new Error(result.message || "Submission failed.");
       }
+
+      trackTikTokEvent("SubmitForm", { form_name: "Wholesale Inquiry" });
+      trackTikTokEvent("Lead", { form_name: "Wholesale Inquiry" });
 
       form.reset();
       setState("success");
@@ -95,15 +100,17 @@ export function InquiryForm() {
         >
           <p>{message}</p>
           {state === "success" ? (
-            <a
+            <TrackedLink
               href={getWhatsAppHref()}
               target="_blank"
               rel="noreferrer"
+              eventName="Contact"
+              eventProperties={{ contact_method: "whatsapp", location: "inquiry_success" }}
               className="mt-3 inline-flex items-center gap-2 font-semibold text-ocean"
             >
               <MessageCircle size={17} />
               Contact on WhatsApp
-            </a>
+            </TrackedLink>
           ) : null}
         </div>
       ) : null}
