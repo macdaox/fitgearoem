@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type React from "react";
 import { ImageUp, Save } from "lucide-react";
-import type { IconName, SiteContent } from "@/lib/site-content";
+import type { HomeIconName, IconName, SiteContent } from "@/lib/site-content";
 
 const iconOptions: Array<{ value: IconName; label: string }> = [
   { value: "rotate", label: "旋转/轴承" },
@@ -11,6 +11,20 @@ const iconOptions: Array<{ value: IconName; label: string }> = [
   { value: "cable", label: "线材/可调节" },
   { value: "zap", label: "速度/轻量" },
   { value: "badge", label: "认证/综合" }
+];
+
+const homeIconOptions: Array<{ value: HomeIconName; label: string }> = [
+  { value: "factory", label: "工厂/面积" },
+  { value: "lines", label: "生产线" },
+  { value: "workers", label: "团队/工人" },
+  { value: "warehouse", label: "仓库/库存" },
+  { value: "globe", label: "全球/国家" },
+  { value: "delivery", label: "准时/交付" },
+  { value: "search", label: "询盘/需求" },
+  { value: "quotation", label: "报价/文件" },
+  { value: "sample", label: "打样/确认" },
+  { value: "production", label: "生产/工厂" },
+  { value: "truck", label: "物流/发货" }
 ];
 
 export function SiteContentForm({ initialContent }: { initialContent: SiteContent }) {
@@ -120,6 +134,27 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
         </div>
       </Section>
 
+      <Section title="首页数据亮点">
+        <div className="grid gap-4">
+          <TextField label="模块小标题" value={content.homeStats.eyebrow} onChange={(value) => setDeepValue("homeStats.eyebrow", value)} />
+          {content.homeStats.items.map((item, index) => (
+            <div key={index} className="rounded-[8px] border border-line bg-mist p-4">
+              <p className="mb-4 text-sm font-semibold text-ink">数据项 {index + 1}</p>
+              <div className="grid gap-4 md:grid-cols-3">
+                <TextField label="数字" value={item.value} onChange={(value) => setDeepValue(`homeStats.items.${index}.value`, value)} />
+                <TextField label="说明" value={item.label} onChange={(value) => setDeepValue(`homeStats.items.${index}.label`, value)} />
+                <IconSelect
+                  label="图标"
+                  value={item.icon}
+                  options={homeIconOptions}
+                  onChange={(value) => setDeepValue(`homeStats.items.${index}.icon`, value)}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </Section>
+
       <Section title="OEM 定制模块">
         <div className="grid gap-4">
           <TextField label="小标题" value={content.oem.eyebrow} onChange={(value) => setDeepValue("oem.eyebrow", value)} />
@@ -151,6 +186,32 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
           <TextField label="小标题" value={content.inquiry.eyebrow} onChange={(value) => setDeepValue("inquiry.eyebrow", value)} />
           <TextField label="标题" value={content.inquiry.title} onChange={(value) => setDeepValue("inquiry.title", value)} />
           <TextareaField label="描述" value={content.inquiry.description} onChange={(value) => setDeepValue("inquiry.description", value)} />
+        </div>
+      </Section>
+
+      <Section title="服务流程">
+        <div className="grid gap-4">
+          <TextField label="模块标题" value={content.serviceProcess.title} onChange={(value) => setDeepValue("serviceProcess.title", value)} />
+          {content.serviceProcess.steps.map((step, index) => (
+            <div key={index} className="rounded-[8px] border border-line bg-mist p-4">
+              <p className="mb-4 text-sm font-semibold text-ink">流程步骤 {index + 1}</p>
+              <div className="grid gap-4 md:grid-cols-2">
+                <TextField label="编号" value={step.number} onChange={(value) => setDeepValue(`serviceProcess.steps.${index}.number`, value)} />
+                <TextField label="标题" value={step.title} onChange={(value) => setDeepValue(`serviceProcess.steps.${index}.title`, value)} />
+                <TextareaField
+                  label="描述"
+                  value={step.description}
+                  onChange={(value) => setDeepValue(`serviceProcess.steps.${index}.description`, value)}
+                />
+                <IconSelect
+                  label="图标"
+                  value={step.icon}
+                  options={homeIconOptions}
+                  onChange={(value) => setDeepValue(`serviceProcess.steps.${index}.icon`, value)}
+                />
+              </div>
+            </div>
+          ))}
         </div>
       </Section>
 
@@ -325,6 +386,35 @@ function TextField({ label, value, hint, onChange }: { label: string; value: str
         className="h-11 rounded-[8px] border border-line bg-white px-3 text-ink outline-none focus:border-ocean"
       />
       {hint ? <span className="text-xs font-normal text-graphite">{hint}</span> : null}
+    </label>
+  );
+}
+
+function IconSelect<T extends string>({
+  label,
+  value,
+  options,
+  onChange
+}: {
+  label: string;
+  value: T;
+  options: Array<{ value: T; label: string }>;
+  onChange: (value: T) => void;
+}) {
+  return (
+    <label className="grid gap-2 text-sm font-medium text-graphite">
+      {label}
+      <select
+        value={value}
+        onChange={(event) => onChange(event.target.value as T)}
+        className="h-11 rounded-[8px] border border-line bg-white px-3 text-ink outline-none focus:border-ocean"
+      >
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
     </label>
   );
 }

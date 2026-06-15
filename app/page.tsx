@@ -1,9 +1,29 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
-import { ArrowDown, BadgeCheck, Cable, ChevronRight, Mail, MessageCircle, PackageCheck, Rotate3D, ShieldCheck, Truck, Zap } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowRight,
+  BadgeCheck,
+  Boxes,
+  Building2,
+  ChevronRight,
+  ClipboardCheck,
+  Cog,
+  Factory,
+  FileText,
+  Globe2,
+  Handshake,
+  Mail,
+  MessageCircle,
+  PackageCheck,
+  Search,
+  Truck,
+  UsersRound,
+} from "lucide-react";
 import { InquiryForm } from "@/components/InquiryForm";
+import { ProductDetailsCarousel } from "@/components/ProductDetailsCarousel";
 import { ScrollAnimations } from "@/components/ScrollAnimations";
-import { getSiteContent, type IconName, type SiteContent } from "@/lib/site-content";
+import { getSiteContent, type HomeIconName, type SiteContent } from "@/lib/site-content";
 import {
   getWhatsAppHref,
   products,
@@ -14,12 +34,18 @@ import {
 
 export const dynamic = "force-dynamic";
 
-const detailIcons: Record<IconName, typeof Rotate3D> = {
-  rotate: Rotate3D,
-  shield: ShieldCheck,
-  cable: Cable,
-  zap: Zap,
-  badge: BadgeCheck
+const homeIcons: Record<HomeIconName, typeof BadgeCheck> = {
+  factory: Building2,
+  lines: Cog,
+  workers: UsersRound,
+  warehouse: Boxes,
+  globe: Globe2,
+  delivery: ClipboardCheck,
+  search: Search,
+  quotation: FileText,
+  sample: Handshake,
+  production: Factory,
+  truck: Truck
 };
 
 export default async function Home() {
@@ -30,12 +56,14 @@ export default async function Home() {
       <ScrollAnimations />
       <Header content={content} />
       <Hero content={content} />
+      <HomeStats content={content} />
       <ProductDetails content={content} />
       <WholesaleTrust />
       <OemModule content={content} />
       <ProductSeries />
       <TrainingScenes />
       <Specifications />
+      <ServiceProcess content={content} />
       <InquirySection content={content} />
       <Footer content={content} />
     </main>
@@ -119,55 +147,36 @@ function Hero({ content }: { content: SiteContent }) {
   );
 }
 
-function ProductDetails({ content }: { content: SiteContent }) {
+function HomeStats({ content }: { content: SiteContent }) {
   return (
-    <section className="bg-white py-16 sm:py-20">
+    <section className="relative z-10 -mt-12 pb-0 sm:-mt-16 lg:-mt-20">
       <div className="section-shell">
-        <div className="reveal mx-auto max-w-3xl text-center">
-          <p className="eyebrow">{content.detailsIntro.eyebrow}</p>
-          <h2 className="mt-4 text-4xl font-semibold leading-tight text-ink sm:text-5xl">
-            {content.detailsIntro.title}
-          </h2>
+        <div className="overflow-hidden rounded-[8px] border border-white/70 bg-white/88 shadow-[0_22px_70px_rgba(40,64,90,0.14)] backdrop-blur-2xl">
+          <div className="grid grid-cols-2 divide-x-0 divide-y divide-line/70 sm:grid-cols-3 lg:grid-cols-6 lg:divide-x lg:divide-y-0">
+            {content.homeStats.items.map((item, index) => {
+              const Icon = homeIcons[item.icon] || BadgeCheck;
+              return (
+                <div key={`${item.label}-${index}`} className="flex min-h-36 flex-col items-center justify-center px-4 py-6 text-center">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-[8px] bg-mist text-ocean">
+                    <Icon size={24} strokeWidth={1.8} />
+                  </div>
+                  <p className="mt-4 text-2xl font-semibold leading-none text-ink">{item.value}</p>
+                  <p className="mt-2 text-sm font-medium leading-5 text-graphite">{item.label}</p>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
+    </section>
+  );
+}
 
-      <div className="mt-14 grid gap-0">
-        {content.productDetails.map((item, index) => {
-          const Icon = detailIcons[item.icon] || BadgeCheck;
-          return (
-            <article key={item.title} className="detail-card relative min-h-screen overflow-hidden bg-ink">
-              <Image
-                src={item.image}
-                width={1672}
-                height={941}
-                alt={`${item.title} jump rope detail`}
-                className="absolute inset-0 h-full w-full object-cover object-center"
-              />
-              <div
-                className={`absolute inset-0 ${
-                  index % 2
-                    ? "bg-gradient-to-l from-ink/82 via-ink/36 to-transparent"
-                    : "bg-gradient-to-r from-ink/82 via-ink/36 to-transparent"
-                }`}
-              />
-              <div className="section-shell relative z-10">
-                <div
-                  className={`flex min-h-screen items-end py-12 sm:py-16 lg:py-20 ${
-                    index % 2 ? "justify-end text-right" : "justify-start"
-                  }`}
-                >
-                  <div className="max-w-xl text-white">
-                    <div className="inline-flex h-11 w-11 items-center justify-center rounded-[8px] bg-white text-ocean shadow-soft">
-                      <Icon size={22} />
-                    </div>
-                    <h3 className="mt-6 text-4xl font-semibold leading-tight sm:text-5xl lg:text-6xl">{item.title}</h3>
-                    <p className="mt-5 text-base leading-7 text-white/78 sm:text-lg">{item.description}</p>
-                  </div>
-                </div>
-              </div>
-            </article>
-          );
-        })}
+function ProductDetails({ content }: { content: SiteContent }) {
+  return (
+    <section className="bg-white pt-16">
+      <div>
+        <ProductDetailsCarousel items={content.productDetails} />
       </div>
     </section>
   );
@@ -340,6 +349,72 @@ function Specifications() {
         </div>
       </div>
     </section>
+  );
+}
+
+function ServiceProcess({ content }: { content: SiteContent }) {
+  return (
+    <section className="bg-mist py-20 sm:py-24">
+      <div className="section-shell">
+        <div className="reveal mx-auto max-w-3xl text-center">
+          <h2 className="text-3xl font-semibold leading-tight text-ink sm:text-5xl">{content.serviceProcess.title}</h2>
+        </div>
+
+        <div className="mt-12 hidden grid-cols-[minmax(0,1fr)_3rem_minmax(0,1fr)_3rem_minmax(0,1fr)_3rem_minmax(0,1fr)_3rem_minmax(0,1fr)] items-center gap-4 lg:grid">
+          {content.serviceProcess.steps.map((step, index) => (
+            <div key={`${step.number}-${step.title}`} className="contents">
+              <ProcessStep step={step} />
+              {index < content.serviceProcess.steps.length - 1 ? (
+                <div className="flex h-64 items-center justify-center text-ocean">
+                  <ArrowRight size={24} strokeWidth={1.8} />
+                </div>
+              ) : null}
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-10 grid gap-4 lg:hidden">
+          {content.serviceProcess.steps.map((step, index) => (
+            <div key={`${step.number}-${step.title}`} className="reveal grid grid-cols-[auto_1fr] gap-4">
+              <div className="flex flex-col items-center">
+                <div className="h-3 w-3 rounded-full bg-ocean" />
+                {index < content.serviceProcess.steps.length - 1 ? <div className="mt-2 h-full min-h-16 w-px bg-line" /> : null}
+              </div>
+              <ProcessStep step={step} align="left" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ProcessStep({
+  step,
+  align = "center"
+}: {
+  step: SiteContent["serviceProcess"]["steps"][number];
+  align?: "center" | "left";
+}) {
+  const Icon = homeIcons[step.icon] || BadgeCheck;
+
+  return (
+    <article
+      className={`reveal flex flex-col rounded-[8px] border border-line bg-white p-5 shadow-soft ${
+        align === "center" ? "h-64 flex-1 items-center justify-center text-center" : "text-left"
+      }`}
+    >
+      <div
+        className={`flex h-12 w-12 items-center justify-center rounded-[8px] border border-line bg-mist text-ocean ${
+          align === "center" ? "mx-auto" : ""
+        }`}
+      >
+        <Icon size={24} strokeWidth={1.8} />
+      </div>
+      <p className="mt-4 text-xs font-semibold uppercase tracking-[0.16em] text-ocean">{step.number}</p>
+      <h3 className="mt-2 text-lg font-semibold text-ink">{step.title}</h3>
+      <p className="mt-3 text-sm leading-6 text-graphite">{step.description}</p>
+    </article>
   );
 }
 

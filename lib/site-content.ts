@@ -4,6 +4,18 @@ import { getSiteDataKv } from "@/lib/cloudflare";
 import { readR2Json, writeR2Json } from "@/lib/r2-data-store";
 
 export type IconName = "rotate" | "shield" | "cable" | "zap" | "badge";
+export type HomeIconName =
+  | "factory"
+  | "lines"
+  | "workers"
+  | "warehouse"
+  | "globe"
+  | "delivery"
+  | "search"
+  | "quotation"
+  | "sample"
+  | "production"
+  | "truck";
 
 export type SiteContent = {
   brand: {
@@ -31,6 +43,14 @@ export type SiteContent = {
     image: string;
     icon: IconName;
   }>;
+  homeStats: {
+    eyebrow: string;
+    items: Array<{
+      value: string;
+      label: string;
+      icon: HomeIconName;
+    }>;
+  };
   oem: {
     eyebrow: string;
     title: string;
@@ -42,6 +62,15 @@ export type SiteContent = {
     eyebrow: string;
     title: string;
     description: string;
+  };
+  serviceProcess: {
+    title: string;
+    steps: Array<{
+      number: string;
+      title: string;
+      description: string;
+      icon: HomeIconName;
+    }>;
   };
   about: {
     eyebrow: string;
@@ -135,6 +164,17 @@ export const defaultSiteContent: SiteContent = {
       icon: "badge"
     }
   ],
+  homeStats: {
+    eyebrow: "Factory Strength",
+    items: [
+      { value: "50,000+ m²", label: "Factory Area", icon: "factory" },
+      { value: "20+", label: "Production Lines", icon: "lines" },
+      { value: "300+", label: "Skilled Workers", icon: "workers" },
+      { value: "100,000+ m²", label: "Warehouse Area", icon: "warehouse" },
+      { value: "100+", label: "Countries Served", icon: "globe" },
+      { value: "98%", label: "On-Time Delivery", icon: "delivery" }
+    ]
+  },
   oem: {
     eyebrow: "OEM / ODM Service",
     title: "Build your own jump rope.",
@@ -146,6 +186,16 @@ export const defaultSiteContent: SiteContent = {
     eyebrow: "Wholesale Inquiry",
     title: "Get wholesale quote.",
     description: "Share your product interest, quantity and customization needs. Our sales team will prepare a focused quote."
+  },
+  serviceProcess: {
+    title: "Our Service Process",
+    steps: [
+      { number: "01", title: "Inquiry", description: "Tell us your requirements and ideas.", icon: "search" },
+      { number: "02", title: "Quotation", description: "We provide a detailed quotation.", icon: "quotation" },
+      { number: "03", title: "Sample", description: "Sample making and confirmation.", icon: "sample" },
+      { number: "04", title: "Production", description: "Mass production with strict quality control.", icon: "production" },
+      { number: "05", title: "Delivery", description: "On-time delivery and after-sales support.", icon: "truck" }
+    ]
   },
   about: {
     eyebrow: "About Us",
@@ -243,12 +293,22 @@ function mergeContent(defaults: SiteContent, value: Partial<SiteContent>): SiteC
     hero: { ...defaults.hero, ...value.hero },
     detailsIntro: { ...defaults.detailsIntro, ...value.detailsIntro },
     productDetails: normalizeDetails(value.productDetails, defaults.productDetails),
+    homeStats: {
+      ...defaults.homeStats,
+      ...value.homeStats,
+      items: normalizeObjectList(value.homeStats?.items, defaults.homeStats.items)
+    },
     oem: {
       ...defaults.oem,
       ...value.oem,
       options: value.oem?.options?.length ? value.oem.options : defaults.oem.options
     },
     inquiry: { ...defaults.inquiry, ...value.inquiry },
+    serviceProcess: {
+      ...defaults.serviceProcess,
+      ...value.serviceProcess,
+      steps: normalizeObjectList(value.serviceProcess?.steps, defaults.serviceProcess.steps)
+    },
     about: {
       ...defaults.about,
       ...value.about,
