@@ -28,7 +28,6 @@ import { getSiteContent, type HomeIconName, type SiteContent } from "@/lib/site-
 import {
   getWhatsAppHref,
   products,
-  scenes,
   specs,
   trustItems
 } from "@/lib/site-data";
@@ -62,7 +61,7 @@ export default async function Home() {
       <WholesaleTrust />
       <OemModule content={content} />
       <ProductSeries />
-      <TrainingScenes />
+      <TrainingScenes content={content} />
       <Specifications />
       <ServiceProcess content={content} />
       <InquirySection content={content} />
@@ -293,32 +292,62 @@ function ProductSeries() {
   );
 }
 
-function TrainingScenes() {
+function TrainingScenes({ content }: { content: SiteContent }) {
   return (
-    <section className="bg-ink py-24 text-white sm:py-32">
-      <div className="section-shell grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+    <section className="relative overflow-hidden bg-ink py-24 text-white sm:py-32">
+      <Image
+        src={content.factoryShowcase.backgroundImage}
+        width={1600}
+        height={900}
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 h-full w-full object-cover opacity-[0.16]"
+      />
+      <div className="absolute inset-0 bg-gradient-to-r from-ink/96 via-ink/86 to-ink/94" />
+
+      <div className="section-shell relative z-10 grid gap-12 lg:grid-cols-[0.8fr_1.35fr] lg:items-center">
         <div className="reveal">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-volt">Training Scenes</p>
-          <h2 className="mt-4 text-4xl font-semibold leading-tight sm:text-5xl">Made for every training scene.</h2>
-          <p className="mt-5 max-w-lg text-base leading-7 text-white/70">
-            One product platform can support branded fitness kits, club equipment, school programs and retail channels.
-          </p>
-          <div className="mt-8 grid grid-cols-2 gap-3">
-            {scenes.map((scene) => (
-              <div key={scene} className="rounded-[8px] border border-white/12 bg-white/8 px-4 py-3 text-sm font-semibold">
-                {scene}
-              </div>
-            ))}
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-volt">{content.factoryShowcase.eyebrow}</p>
+          <h2 className="mt-4 text-4xl font-semibold uppercase leading-tight sm:text-5xl">{content.factoryShowcase.title}</h2>
+          <div className="mt-8 grid gap-5">
+            {content.factoryShowcase.features.map((item) => {
+              const Icon = homeIcons[item.icon] || BadgeCheck;
+              return (
+                <article key={item.title} className="grid grid-cols-[auto_1fr] gap-4">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full border border-white/28 text-white">
+                    <Icon size={24} strokeWidth={1.8} />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold uppercase leading-tight">{item.title}</h3>
+                    <p className="mt-2 max-w-md text-sm leading-6 text-white/68">{item.description}</p>
+                  </div>
+                </article>
+              );
+            })}
           </div>
+          <a
+            href="/about"
+            className="mt-9 inline-flex h-12 min-w-40 items-center justify-center rounded-[8px] bg-ocean px-6 text-sm font-bold uppercase tracking-[0.06em] text-white transition hover:bg-[#1671c9]"
+          >
+            {content.factoryShowcase.buttonText}
+          </a>
         </div>
-        <div className="reveal overflow-hidden rounded-[8px] bg-white/10">
-          <Image
-            src="/images/training-set.jpg"
-            width={1280}
-            height={1707}
-            alt="Jump rope set for multiple training and retail scenes"
-            className="aspect-[4/3] h-full w-full object-cover"
-          />
+
+        <div className="reveal grid gap-3 sm:grid-cols-2">
+          {content.factoryShowcase.images.map((item) => (
+            <article key={item.title} className="group relative overflow-hidden rounded-[8px] bg-white/10">
+              <Image
+                src={item.image}
+                width={900}
+                height={520}
+                alt={`${item.title} factory photo`}
+                className="aspect-[16/9] h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+              />
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/82 to-transparent px-5 pb-4 pt-14">
+                <h3 className="text-lg font-semibold text-white">{item.title}</h3>
+              </div>
+            </article>
+          ))}
         </div>
       </div>
     </section>

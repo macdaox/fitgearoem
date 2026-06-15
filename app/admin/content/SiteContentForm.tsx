@@ -155,6 +155,81 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
         </div>
       </Section>
 
+      <Section title="工厂实力模块">
+        <div className="grid gap-4">
+          <TextField
+            label="小标题"
+            value={content.factoryShowcase.eyebrow}
+            onChange={(value) => setDeepValue("factoryShowcase.eyebrow", value)}
+          />
+          <TextField
+            label="标题"
+            value={content.factoryShowcase.title}
+            onChange={(value) => setDeepValue("factoryShowcase.title", value)}
+          />
+          <ImageField
+            label="深色背景图片"
+            value={content.factoryShowcase.backgroundImage}
+            onChange={(url) => updateImage("factoryShowcase.backgroundImage", url)}
+          />
+          <TextField
+            label="按钮文字"
+            value={content.factoryShowcase.buttonText}
+            onChange={(value) => setDeepValue("factoryShowcase.buttonText", value)}
+          />
+
+          <div className="grid gap-4">
+            <p className="text-sm font-semibold text-ink">左侧卖点</p>
+            {content.factoryShowcase.features.map((item, index) => (
+              <div key={index} className="rounded-[8px] border border-line bg-mist p-4">
+                <p className="mb-4 text-sm font-semibold text-ink">卖点 {index + 1}</p>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <TextField
+                    label="标题"
+                    value={item.title}
+                    onChange={(value) => setDeepValue(`factoryShowcase.features.${index}.title`, value)}
+                  />
+                  <IconSelect
+                    label="图标"
+                    value={item.icon}
+                    options={homeIconOptions}
+                    onChange={(value) => setDeepValue(`factoryShowcase.features.${index}.icon`, value)}
+                  />
+                  <div className="md:col-span-2">
+                    <TextareaField
+                      label="描述"
+                      value={item.description}
+                      onChange={(value) => setDeepValue(`factoryShowcase.features.${index}.description`, value)}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="grid gap-4">
+            <p className="text-sm font-semibold text-ink">右侧工厂照片</p>
+            {content.factoryShowcase.images.map((item, index) => (
+              <div key={index} className="rounded-[8px] border border-line bg-mist p-4">
+                <p className="mb-4 text-sm font-semibold text-ink">工厂照片 {index + 1}</p>
+                <div className="grid gap-4 md:grid-cols-[0.75fr_1.25fr]">
+                  <TextField
+                    label="图片标题"
+                    value={item.title}
+                    onChange={(value) => setDeepValue(`factoryShowcase.images.${index}.title`, value)}
+                  />
+                  <ImageField
+                    label="图片"
+                    value={item.image}
+                    onChange={(url) => updateImage(`factoryShowcase.images.${index}.image`, url)}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Section>
+
       <Section title="OEM 定制模块">
         <div className="grid gap-4">
           <TextField label="小标题" value={content.oem.eyebrow} onChange={(value) => setDeepValue("oem.eyebrow", value)} />

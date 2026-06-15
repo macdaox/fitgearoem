@@ -72,6 +72,21 @@ export type SiteContent = {
       icon: HomeIconName;
     }>;
   };
+  factoryShowcase: {
+    eyebrow: string;
+    title: string;
+    backgroundImage: string;
+    buttonText: string;
+    features: Array<{
+      title: string;
+      description: string;
+      icon: HomeIconName;
+    }>;
+    images: Array<{
+      title: string;
+      image: string;
+    }>;
+  };
   about: {
     eyebrow: string;
     title: string;
@@ -197,6 +212,45 @@ export const defaultSiteContent: SiteContent = {
       { number: "05", title: "Delivery", description: "On-time delivery and after-sales support.", icon: "truck" }
     ]
   },
+  factoryShowcase: {
+    eyebrow: "Why Choose",
+    title: "Why choose ApexRope?",
+    backgroundImage: "/images/training-set.jpg",
+    buttonText: "About Us",
+    features: [
+      {
+        title: "Advanced Production",
+        description: "Automated equipment and mature technology support efficient, stable output.",
+        icon: "production"
+      },
+      {
+        title: "Strict Quality Control",
+        description: "Full inspection from material preparation to finished products.",
+        icon: "delivery"
+      },
+      {
+        title: "Large Production Capacity",
+        description: "Flexible production planning for bulk orders and repeat purchasing.",
+        icon: "lines"
+      },
+      {
+        title: "Experienced Team",
+        description: "Sales, sampling and QC support for overseas wholesale buyers.",
+        icon: "workers"
+      },
+      {
+        title: "Global Partners",
+        description: "Export-ready communication and shipping support for international buyers.",
+        icon: "globe"
+      }
+    ],
+    images: [
+      { title: "Injection Workshop", image: "/images/training-set.jpg" },
+      { title: "Assembly Line", image: "/images/oem-colors.png" },
+      { title: "Warehouse", image: "/images/product-pack.jpg" },
+      { title: "Shipping", image: "/images/pair-series.jpg" }
+    ]
+  },
   about: {
     eyebrow: "About Us",
     title: "Fitness supply built for brands that move fast.",
@@ -308,6 +362,12 @@ function mergeContent(defaults: SiteContent, value: Partial<SiteContent>): SiteC
       ...defaults.serviceProcess,
       ...value.serviceProcess,
       steps: normalizeObjectList(value.serviceProcess?.steps, defaults.serviceProcess.steps)
+    },
+    factoryShowcase: {
+      ...defaults.factoryShowcase,
+      ...value.factoryShowcase,
+      features: normalizeObjectList(value.factoryShowcase?.features, defaults.factoryShowcase.features),
+      images: normalizeObjectList(value.factoryShowcase?.images, defaults.factoryShowcase.images)
     },
     about: {
       ...defaults.about,
