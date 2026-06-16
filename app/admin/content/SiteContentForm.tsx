@@ -93,7 +93,12 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
           <TextField label="小标题" value={content.hero.eyebrow} onChange={(value) => setDeepValue("hero.eyebrow", value)} />
           <TextField label="主标题" value={content.hero.title} onChange={(value) => setDeepValue("hero.title", value)} />
           <TextareaField label="描述" value={content.hero.description} onChange={(value) => setDeepValue("hero.description", value)} />
-          <ImageField label="Hero 图片" value={content.hero.image} onChange={(url) => updateImage("hero.image", url)} />
+          <ImageField
+            label="Hero 图片"
+            value={content.hero.image}
+            onChange={(url) => updateImage("hero.image", url)}
+            hint="建议尺寸：1920 x 1080px 或 2400 x 1350px，横版 16:9，主体尽量偏右，左侧留文字空间。"
+          />
           <TextField
             label="图片裁切位置"
             value={content.hero.imagePosition}
@@ -113,7 +118,12 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
               <div className="grid gap-4">
                 <TextField label="标题" value={item.title} onChange={(value) => setDeepValue(`productDetails.${index}.title`, value)} />
                 <TextareaField label="描述" value={item.description} onChange={(value) => setDeepValue(`productDetails.${index}.description`, value)} />
-                <ImageField label="图片" value={item.image} onChange={(url) => updateImage(`productDetails.${index}.image`, url)} />
+                <ImageField
+                  label="图片"
+                  value={item.image}
+                  onChange={(url) => updateImage(`productDetails.${index}.image`, url)}
+                  hint="建议尺寸：1920 x 1080px，横版 16:9。用于大图/轮播展示，主体居中或偏右。"
+                />
                 <label className="grid gap-2 text-sm font-medium text-graphite">
                   图标
                   <select
@@ -171,6 +181,7 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
             label="深色背景图片"
             value={content.factoryShowcase.backgroundImage}
             onChange={(url) => updateImage("factoryShowcase.backgroundImage", url)}
+            hint="建议尺寸：2400 x 740px 或 1920 x 590px，超宽横版。用于工厂模块顶部大图。"
           />
           <TextField
             label="按钮文字"
@@ -222,6 +233,7 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
                     label="图片"
                     value={item.image}
                     onChange={(url) => updateImage(`factoryShowcase.images.${index}.image`, url)}
+                    hint="建议尺寸：800 x 520px 或 1200 x 780px，横版 3:2。用于工厂小图卡片。"
                   />
                 </div>
               </div>
@@ -235,7 +247,12 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
           <TextField label="小标题" value={content.oem.eyebrow} onChange={(value) => setDeepValue("oem.eyebrow", value)} />
           <TextField label="标题" value={content.oem.title} onChange={(value) => setDeepValue("oem.title", value)} />
           <TextareaField label="描述" value={content.oem.description} onChange={(value) => setDeepValue("oem.description", value)} />
-          <ImageField label="背景图片" value={content.oem.image} onChange={(url) => updateImage("oem.image", url)} />
+          <ImageField
+            label="背景图片"
+            value={content.oem.image}
+            onChange={(url) => updateImage("oem.image", url)}
+            hint="建议尺寸：1400 x 760px 或 1920 x 1080px，横版。用于 OEM 服务右侧产品图。"
+          />
           <TextareaField
             label="定制选项"
             value={content.oem.options.join("\n")}
@@ -295,7 +312,12 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
           <TextField label="页面小标题" value={content.about.eyebrow} onChange={(value) => setDeepValue("about.eyebrow", value)} />
           <TextField label="页面主标题" value={content.about.title} onChange={(value) => setDeepValue("about.title", value)} />
           <TextareaField label="页面描述" value={content.about.description} onChange={(value) => setDeepValue("about.description", value)} />
-          <ImageField label="页面 Hero 图片" value={content.about.heroImage} onChange={(url) => updateImage("about.heroImage", url)} />
+          <ImageField
+            label="页面 Hero 图片"
+            value={content.about.heroImage}
+            onChange={(url) => updateImage("about.heroImage", url)}
+            hint="建议尺寸：1920 x 1080px，横版 16:9。"
+          />
           <TextField
             label="Hero 图片裁切位置"
             value={content.about.imagePosition}
@@ -320,7 +342,12 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
           <TextField label="工厂/服务区小标题" value={content.about.factoryEyebrow} onChange={(value) => setDeepValue("about.factoryEyebrow", value)} />
           <TextField label="工厂/服务区标题" value={content.about.factoryTitle} onChange={(value) => setDeepValue("about.factoryTitle", value)} />
           <TextareaField label="工厂/服务区正文" value={content.about.factoryText} onChange={(value) => setDeepValue("about.factoryText", value)} />
-          <ImageField label="工厂/服务区图片" value={content.about.factoryImage} onChange={(url) => updateImage("about.factoryImage", url)} />
+          <ImageField
+            label="工厂/服务区图片"
+            value={content.about.factoryImage}
+            onChange={(url) => updateImage("about.factoryImage", url)}
+            hint="建议尺寸：1200 x 800px 或 1600 x 1000px，横版 3:2。"
+          />
           <TextareaField
             label="流程步骤"
             value={content.about.processSteps.join("\n")}
@@ -519,7 +546,17 @@ function TextareaField({
   );
 }
 
-function ImageField({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
+function ImageField({
+  label,
+  value,
+  hint,
+  onChange
+}: {
+  label: string;
+  value: string;
+  hint?: string;
+  onChange: (value: string) => void;
+}) {
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -558,6 +595,7 @@ function ImageField({ label, value, onChange }: { label: string; value: string; 
   return (
     <div className="grid gap-2 text-sm font-medium text-graphite">
       <span>{label}</span>
+      {hint ? <span className="text-xs font-normal leading-5 text-graphite">{hint}</span> : null}
       <div className="grid gap-3 lg:grid-cols-[1fr_auto]">
         <input
           value={value}

@@ -1,14 +1,17 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
 import {
-  ArrowDown,
   ArrowRight,
   BadgeCheck,
+  Barcode,
+  BookOpen,
   Boxes,
   Building2,
   ChevronRight,
+  CheckCircle2,
   ClipboardCheck,
   Cog,
+  Download,
   Factory,
   FileText,
   Globe2,
@@ -16,20 +19,22 @@ import {
   Mail,
   MessageCircle,
   PackageCheck,
+  Palette,
+  Ruler,
+  ShieldCheck,
+  Ship,
   Search,
   Truck,
   UsersRound,
+  Wrench,
 } from "lucide-react";
 import { InquiryForm } from "@/components/InquiryForm";
-import { ProductDetailsCarousel } from "@/components/ProductDetailsCarousel";
 import { ScrollAnimations } from "@/components/ScrollAnimations";
 import { TrackedLink } from "@/components/TrackedLink";
 import { getSiteContent, type HomeIconName, type SiteContent } from "@/lib/site-content";
 import {
   getWhatsAppHref,
-  products,
-  specs,
-  trustItems
+  products
 } from "@/lib/site-data";
 
 export const dynamic = "force-dynamic";
@@ -48,6 +53,40 @@ const homeIcons: Record<HomeIconName, typeof BadgeCheck> = {
   truck: Truck
 };
 
+const heroBadges = ["Low MOQ", "OEM / ODM Available", "Fast Sample Service", "15-25 Days Lead Time"];
+
+const oemServiceItems = [
+  { label: "Custom Logo", icon: BadgeCheck },
+  { label: "Custom Color", icon: Palette },
+  { label: "Product Design", icon: Ruler },
+  { label: "Private Mold", icon: Wrench },
+  { label: "Retail Packaging", icon: Boxes },
+  { label: "Amazon Packaging", icon: PackageCheck },
+  { label: "Instruction Manual", icon: BookOpen },
+  { label: "Barcode Label", icon: Barcode },
+  { label: "Quality Testing", icon: ShieldCheck }
+];
+
+const featuredProducts = [
+  { name: "Speed Jump Rope", code: "T003", image: "/images/hero-jump-rope.jpg" },
+  { name: "Digital Jump Rope", code: "H801S", image: "/images/detail-grip.png" },
+  { name: "Smart Jump Rope", code: "T001", image: "/images/speed-rope-blue.png" },
+  { name: "Massage Gun", code: "T023", image: "/images/Massage gun.png" },
+  { name: "Massage Stick", code: "T028", image: "/images/weighted-rope.jpg" }
+];
+
+const kidsProducts = [
+  { name: "Duck Jump Rope", image: "/images/kids-rope.jpg" },
+  { name: "Bear Jump Rope", image: "/images/pair-series.png" },
+  { name: "Ice Cream Jump Rope", image: "/images/speed-rope-blue.png" },
+  { name: "Colorful Bamboo Rope", image: "/images/oem-colors.png" },
+  { name: "Kids Training Rope", image: "/images/speed-rope-pink.jpg" }
+];
+
+const buyerTypes = ["Fitness Brands", "Amazon Sellers", "Distributors", "Gym Chains", "Sports Stores", "Boxing Clubs"];
+
+const shippingMethods = ["FOB", "EXW", "DDP", "Sea Freight", "Air Freight", "Express"];
+
 export default async function Home() {
   const content = await getSiteContent();
 
@@ -56,13 +95,11 @@ export default async function Home() {
       <ScrollAnimations />
       <Header content={content} />
       <Hero content={content} />
-      <HomeStats content={content} />
-      <ProductDetails content={content} />
-      <WholesaleTrust />
-      <OemModule content={content} />
+      <FactoryShowcase content={content} />
+      <OemServiceBand content={content} />
       <ProductSeries />
-      <TrainingScenes content={content} />
-      <Specifications />
+      <ProductCollections />
+      <TrustPanels />
       <ServiceProcess content={content} />
       <InquirySection content={content} />
       <Footer content={content} />
@@ -72,32 +109,55 @@ export default async function Home() {
 
 function Header({ content }: { content: SiteContent }) {
   return (
-    <header className="fixed left-0 right-0 top-4 z-50 px-4 sm:top-5">
-      <nav className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between rounded-full border border-white/55 bg-white/38 px-4 shadow-[0_18px_60px_rgba(40,64,90,0.16)] backdrop-blur-2xl backdrop-saturate-150 sm:px-5">
-        <a href="/" className="rounded-full px-2 text-sm font-bold text-ink transition hover:bg-white/35">
-          {content.brand.name}
+    <header className="fixed left-0 right-0 top-0 z-50 border-b border-white/10 bg-[#071016]/80 px-4 backdrop-blur-xl">
+      <nav className="mx-auto flex h-[72px] w-full max-w-7xl items-center justify-between gap-5">
+        <a href="/" className="grid leading-none text-white">
+          <span className="text-2xl font-black uppercase italic tracking-tight">
+            {content.brand.name.split(" ")[0]} <span className="text-[#1d82ff]">OEM</span>
+          </span>
+          <span className="mt-1 text-[0.62rem] font-bold uppercase tracking-[0.14em] text-white/75">Fitness Equipment Manufacturer</span>
         </a>
-        <div className="hidden items-center rounded-full border border-white/45 bg-white/24 px-2 py-1 text-sm font-medium text-graphite shadow-inner shadow-white/20 md:flex">
-          <a href="/about" className="rounded-full px-4 py-2 transition hover:bg-white/55 hover:text-ink">
-            About Us
+        <div className="hidden items-center gap-7 text-xs font-bold uppercase tracking-[0.04em] text-white/75 lg:flex">
+          <a href="/" className="border-b-2 border-[#1d82ff] py-6 text-white">
+            Home
           </a>
-          <a href="#products" className="rounded-full px-4 py-2 transition hover:bg-white/55 hover:text-ink">
+          <a href="#products" className="py-6 transition hover:text-white">
             Products
           </a>
-          <a href="#oem" className="rounded-full px-4 py-2 transition hover:bg-white/55 hover:text-ink">
-            OEM Service
+          <a href="#oem" className="py-6 transition hover:text-white">
+            OEM / ODM Service
           </a>
-          <a href="#specs" className="rounded-full px-4 py-2 transition hover:bg-white/55 hover:text-ink">
-            Specifications
+          <a href="#factory" className="py-6 transition hover:text-white">
+            Factory
+          </a>
+          <a href="/about" className="py-6 transition hover:text-white">
+            About Us
+          </a>
+          <a href="#inquiry" className="py-6 transition hover:text-white">
+            Contact Us
           </a>
         </div>
-        <a
-          href="#inquiry"
-          className="inline-flex h-10 items-center gap-2 rounded-full border border-white/50 bg-ink/88 px-4 text-sm font-semibold text-white shadow-[0_10px_26px_rgba(16,17,20,0.18)] transition hover:bg-ink"
-        >
-          Quote
-          <ChevronRight size={16} />
-        </a>
+        <div className="flex items-center gap-2">
+          <a
+            href="#inquiry"
+            className="hidden h-10 items-center gap-2 rounded-[6px] bg-[#0d7cff] px-4 text-xs font-bold uppercase text-white shadow-[0_10px_24px_rgba(13,124,255,0.25)] transition hover:bg-[#006be6] sm:inline-flex"
+          >
+            Get Factory Quote
+          </a>
+          <a
+            href="#products"
+            className="hidden h-10 items-center gap-2 rounded-[6px] border border-white/28 px-4 text-xs font-bold uppercase text-white transition hover:border-white sm:inline-flex"
+          >
+            Download Catalog
+          </a>
+          <a
+            href="#inquiry"
+            className="inline-flex h-10 items-center gap-2 rounded-[6px] bg-[#0d7cff] px-3 text-xs font-bold uppercase text-white sm:hidden"
+          >
+            Quote
+            <ChevronRight size={16} />
+          </a>
+        </div>
       </nav>
     </header>
   );
@@ -105,141 +165,199 @@ function Header({ content }: { content: SiteContent }) {
 
 function Hero({ content }: { content: SiteContent }) {
   return (
-    <section className="relative min-h-screen overflow-hidden bg-mist">
+    <section className="relative min-h-screen bg-[#071016] text-white">
       <Image
         src={content.hero.image}
         width={1672}
         height={941}
         priority
-        alt="Premium pastel speed jump rope product display"
+        alt="OEM jump rope and fitness product hero display"
         className="hero-product absolute inset-0 h-full w-full object-cover"
         style={{ objectPosition: content.hero.imagePosition }}
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-white/96 via-white/72 to-white/8" />
-      <div className="absolute inset-0 bg-gradient-to-t from-white/55 via-transparent to-white/25" />
+      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(7,16,22,0.96),rgba(7,16,22,0.74)_42%,rgba(7,16,22,0.12)_76%,rgba(7,16,22,0.28))]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_38%,rgba(13,124,255,0.12),transparent_34%)]" />
+      <div className="absolute inset-x-0 bottom-0 h-52 bg-gradient-to-t from-[#071016] via-[#071016]/70 to-transparent" />
 
-      <div className="section-shell relative z-10 flex min-h-screen items-end pb-20 pt-28 sm:pb-24 lg:pb-32">
-        <div className="reveal max-w-3xl text-ink">
-          <p className="eyebrow">{content.hero.eyebrow}</p>
-          <h1 className="mt-5 max-w-4xl text-5xl font-semibold leading-[1.02] text-ink sm:text-7xl lg:text-8xl">
-            {content.hero.title}
+      <div className="section-shell relative z-10 flex min-h-screen items-center pb-36 pt-28 lg:pt-24">
+        <div className="max-w-4xl">
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#48a5ff]">{content.hero.eyebrow}</p>
+          <h1 className="mt-5 max-w-4xl text-4xl font-black uppercase leading-[1.04] tracking-tight text-white sm:text-6xl lg:text-7xl">
+            Build your fitness brand{" "}
+            <span className="text-[#1d82ff]">with factory-direct manufacturing</span>
           </h1>
-          <p className="mt-6 max-w-xl text-lg leading-8 text-graphite">{content.hero.description}</p>
+          <p className="mt-6 max-w-xl text-lg font-medium leading-8 text-white/80">
+            OEM / ODM jump ropes, kids ropes, massage guns and fitness accessories for wholesale buyers.
+          </p>
+          <div className="mt-6 grid max-w-xl grid-cols-2 gap-3 text-sm font-semibold text-white/80 sm:grid-cols-4">
+            {heroBadges.map((badge) => (
+              <span key={badge} className="inline-flex items-center gap-2">
+                <CheckCircle2 size={16} className="text-[#1d82ff]" />
+                {badge}
+              </span>
+            ))}
+          </div>
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
             <a
               href="#inquiry"
-              className="inline-flex h-12 items-center justify-center gap-2 rounded-[8px] bg-ink px-6 text-sm font-semibold text-white transition hover:bg-graphite"
+              className="inline-flex h-[52px] items-center justify-center gap-3 rounded-[6px] bg-[#0d7cff] px-7 text-sm font-bold uppercase text-white shadow-[0_12px_30px_rgba(13,124,255,0.28)] transition hover:bg-[#006be6]"
             >
-              <Mail size={18} />
-              Get Wholesale Quote
+              Get Factory Quote
+              <ArrowRight size={18} />
             </a>
             <a
               href="#products"
-              className="inline-flex h-12 items-center justify-center gap-2 rounded-[8px] border border-line bg-white/70 px-6 text-sm font-semibold text-ink backdrop-blur transition hover:border-ink hover:bg-white"
+              className="inline-flex h-[52px] items-center justify-center gap-3 rounded-[6px] border border-white/30 bg-white/5 px-7 text-sm font-bold uppercase text-white backdrop-blur transition hover:border-white hover:bg-white/10"
             >
-              <ArrowDown size={18} />
-              View Products
+              Download Catalog
+              <Download size={17} />
             </a>
           </div>
         </div>
       </div>
+
+      <FloatingContact content={content} />
+      <HomeStats content={content} />
     </section>
   );
 }
 
 function HomeStats({ content }: { content: SiteContent }) {
   return (
-    <section className="relative z-20 bg-white py-10 sm:py-12 lg:py-14">
+    <div className="absolute inset-x-0 bottom-0 z-30 translate-y-1/2">
       <div className="section-shell">
-        <div className="mx-auto max-w-7xl rounded-[8px] border border-white/80 bg-white/92 p-4 shadow-[0_18px_46px_rgba(40,64,90,0.11)] backdrop-blur-2xl sm:p-5 lg:p-6">
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-6 lg:gap-6">
+        <div className="mx-auto overflow-hidden rounded-[8px] border border-white/10 bg-[#08141d]/95 shadow-[0_22px_52px_rgba(6,14,20,0.24)] backdrop-blur-xl">
+          <div className="grid grid-cols-2 divide-x-0 divide-y divide-white/10 sm:grid-cols-3 lg:grid-cols-6 lg:divide-x lg:divide-y-0">
             {content.homeStats.items.map((item, index) => {
               const Icon = homeIcons[item.icon] || BadgeCheck;
               return (
-                <div key={`${item.label}-${index}`} className="flex min-h-32 flex-col items-center justify-center rounded-[8px] px-4 py-5 text-center">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-[8px] bg-mist text-ocean">
-                    <Icon size={24} strokeWidth={1.8} />
+                <div key={`${item.label}-${index}`} className="flex min-h-24 items-center justify-center gap-3 px-4 py-5 text-left lg:min-h-28 xl:gap-4 xl:px-5">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center text-white">
+                    <Icon size={32} strokeWidth={1.65} />
                   </div>
-                  <p className="mt-4 text-2xl font-semibold leading-none text-ink lg:text-[1.7rem]">{item.value}</p>
-                  <p className="mt-2 text-sm font-medium leading-5 text-graphite">{item.label}</p>
+                  <div>
+                    <p className="whitespace-nowrap text-xl font-black leading-none text-white xl:text-2xl">{item.value}</p>
+                    <p className="mt-1 whitespace-nowrap text-[0.72rem] font-medium leading-5 text-white/70 xl:text-xs">{item.label}</p>
+                  </div>
                 </div>
               );
             })}
           </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 }
 
-function ProductDetails({ content }: { content: SiteContent }) {
-  return (
-    <section className="relative z-10 bg-white">
-      <div>
-        <ProductDetailsCarousel items={content.productDetails} />
-      </div>
-    </section>
-  );
-}
+function FactoryShowcase({ content }: { content: SiteContent }) {
+  const factoryFeatures = content.factoryShowcase.features.slice(0, 4);
 
-function WholesaleTrust() {
   return (
-    <section className="bg-mist py-24 sm:py-32">
+    <section id="factory" className="bg-[#f4f7fb] pb-7 pt-24 lg:pt-28">
       <div className="section-shell">
-        <div className="reveal flex flex-col justify-between gap-6 md:flex-row md:items-end">
-          <div>
-            <p className="eyebrow">B2B Supply</p>
-            <h2 className="mt-4 max-w-3xl text-4xl font-semibold leading-tight text-ink sm:text-5xl">
-              Why wholesale buyers choose us.
+        <div className="grid gap-5 rounded-[8px] border border-line bg-white p-5 shadow-soft lg:grid-cols-[0.52fr_1.48fr]">
+          <div className="reveal flex flex-col justify-center rounded-[8px] bg-white p-1 lg:p-0">
+            <p className="text-[0.7rem] font-black uppercase tracking-[0.12em] text-[#0d7cff]">Our Factory</p>
+            <h2 className="mt-3 text-2xl font-black uppercase leading-[1.1] tracking-tight text-[#081422] sm:text-3xl">
+              Built for quality.
+              <br />
+              Made for your brand.
             </h2>
+            <p className="mt-4 max-w-sm text-sm leading-6 text-graphite">
+              FitGear OEM is a professional manufacturer with complete production capability, strict quality control and fast delivery support for business growth.
+            </p>
+            <div className="mt-5 grid gap-2.5">
+              {factoryFeatures.map((item) => {
+                const Icon = homeIcons[item.icon] || BadgeCheck;
+                return (
+                  <div key={item.title} className="grid grid-cols-[auto_1fr] items-center gap-2 text-sm">
+                    <Icon size={17} className="text-[#0d7cff]" strokeWidth={2} />
+                    <h3 className="font-semibold leading-5 text-[#081422]">{item.title}</h3>
+                  </div>
+                );
+              })}
+            </div>
+            <a
+              href="/about"
+              className="mt-6 inline-flex h-10 w-fit items-center justify-center gap-3 rounded-[6px] bg-[#0d7cff] px-5 text-xs font-black uppercase text-white transition hover:bg-[#006be6]"
+            >
+              View Factory Tour
+              <ChevronRight size={16} />
+            </a>
           </div>
-          <p className="max-w-md text-base leading-7 text-graphite">
-            Built around clear communication, repeatable quality and export-ready order support.
-          </p>
-        </div>
 
-        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {trustItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <article key={item.title} className="reveal rounded-[8px] border border-line bg-white p-6 shadow-soft">
-                <Icon className="text-ocean" size={26} />
-                <h3 className="mt-5 text-xl font-semibold text-ink">{item.title}</h3>
-                <p className="mt-3 text-sm leading-6 text-graphite">{item.description}</p>
-              </article>
-            );
-          })}
-        </div>
+          <div className="reveal grid gap-2">
+            <div className="relative overflow-hidden rounded-[8px]">
+              <Image
+                src={content.factoryShowcase.backgroundImage}
+                width={1400}
+                height={560}
+                alt="Factory building and production capability"
+                className="aspect-[3.25/1] w-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-ink/20 to-transparent" />
+            </div>
+            <div className="grid gap-2 sm:grid-cols-4">
+              {content.factoryShowcase.images.map((item) => (
+                <article key={item.title} className="group relative overflow-hidden rounded-[8px] bg-ink">
+                  <Image
+                    src={item.image}
+                    width={520}
+                    height={320}
+                    alt={`${item.title} factory photo`}
+                    className="aspect-[1.55/1] w-full object-cover opacity-90 transition duration-500 group-hover:scale-[1.04]"
+                  />
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/90 to-transparent px-4 pb-3 pt-10">
+                    <h3 className="text-sm font-bold text-white">{item.title}</h3>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+      </div>
       </div>
     </section>
   );
 }
 
-function OemModule({ content }: { content: SiteContent }) {
+function OemServiceBand({ content }: { content: SiteContent }) {
   return (
-    <section id="oem" className="relative min-h-screen overflow-hidden bg-ink py-24 sm:py-32">
-      <Image
-        src={content.oem.image}
-        width={1672}
-        height={941}
-        alt="Custom color jump rope display for OEM programs"
-        className="absolute inset-0 h-full w-full object-cover object-center"
-      />
-      <div className="absolute inset-0 bg-gradient-to-r from-white/94 via-white/78 to-white/10" />
-      <div className="section-shell relative z-10 flex min-h-[calc(100vh-10rem)] items-center">
-        <div className="reveal max-w-2xl">
-          <p className="eyebrow">{content.oem.eyebrow}</p>
-          <h2 className="mt-4 text-4xl font-semibold leading-tight text-ink sm:text-6xl">{content.oem.title}</h2>
-          <p className="mt-5 max-w-xl text-base leading-7 text-graphite">{content.oem.description}</p>
-          <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3">
-            {content.oem.options.map((option) => (
-              <div
-                key={option}
-                className="rounded-[8px] border border-white/70 bg-white/78 px-4 py-3 text-sm font-semibold text-ink shadow-soft backdrop-blur transition hover:-translate-y-1 hover:border-ocean hover:bg-white"
-              >
-                {option}
-              </div>
-            ))}
+    <section id="oem" className="bg-[#f4f7fb] pb-7">
+      <div className="section-shell">
+        <div className="grid overflow-hidden rounded-[8px] border border-line bg-white shadow-soft lg:grid-cols-[1.45fr_0.85fr]">
+          <div className="reveal p-5 sm:p-7">
+            <p className="text-sm font-black uppercase tracking-[0.04em] text-[#081422]">One-stop OEM / ODM Service</p>
+            <div className="mt-5 grid grid-cols-3 gap-4 sm:grid-cols-5 lg:grid-cols-9">
+              {oemServiceItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <div key={item.label} className="grid justify-items-center gap-2 text-center">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-[8px] border border-line bg-[#f7faff] text-[#0d7cff]">
+                      <Icon size={23} strokeWidth={1.8} />
+                    </div>
+                    <p className="text-[0.68rem] font-semibold leading-4 text-[#081422]">{item.label}</p>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-xs font-bold text-[#081422]">
+              {["Low MOQ", "Fast Sample", "15-25 Days Lead Time", "Flexible Payment Terms"].map((item) => (
+                <span key={item} className="inline-flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#0d7cff]" />
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="relative min-h-64 overflow-hidden bg-[#eaf0f7]">
+            <Image
+              src={content.oem.image}
+              width={900}
+              height={560}
+              alt="OEM jump rope packaging and product customization"
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-white/20 via-transparent to-transparent" />
           </div>
         </div>
       </div>
@@ -249,39 +367,30 @@ function OemModule({ content }: { content: SiteContent }) {
 
 function ProductSeries() {
   return (
-    <section id="products" className="bg-mist py-24 sm:py-32">
+    <section id="products" className="bg-[#f4f7fb] pb-7">
       <div className="section-shell">
-        <div className="reveal max-w-3xl">
-          <p className="eyebrow">Product Series</p>
-          <h2 className="mt-4 text-4xl font-semibold leading-tight text-ink sm:text-5xl">A complete line for wholesale programs.</h2>
+        <div className="reveal text-center">
+          <h2 className="text-2xl font-black uppercase tracking-tight text-[#081422]">Our Product Categories</h2>
+          <div className="mx-auto mt-3 h-1 w-20 rounded-full bg-[#0d7cff]" />
         </div>
 
-        <div className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-5">
+        <div className="mt-6 grid gap-2 md:grid-cols-3 xl:grid-cols-5">
           {products.map((product) => (
-            <article key={product.name} className="reveal rounded-[8px] border border-line bg-white p-4 shadow-soft">
+            <article key={product.name} className="reveal group relative overflow-hidden rounded-[8px] bg-[#071016] shadow-soft">
               <Image
                 src={product.image}
                 width={900}
-                height={1200}
+                height={700}
                 alt={`${product.name} product photo`}
-                className="aspect-[4/5] w-full rounded-[8px] bg-mist object-cover"
+                className="aspect-[1.45/1] w-full object-cover opacity-80 transition duration-500 group-hover:scale-[1.04]"
               />
-              <h3 className="mt-5 text-xl font-semibold text-ink">{product.name}</h3>
-              <p className="mt-3 min-h-20 text-sm leading-6 text-graphite">{product.description}</p>
-              <div className="mt-5 grid gap-2">
-                <a
-                  href="#specs"
-                  className="inline-flex h-10 items-center justify-center gap-2 rounded-[8px] border border-line text-sm font-semibold text-ink transition hover:border-ink"
-                >
-                  <PackageCheck size={16} />
-                  View Details
-                </a>
-                <a
-                  href="#inquiry"
-                  className="inline-flex h-10 items-center justify-center gap-2 rounded-[8px] bg-ink text-sm font-semibold text-white transition hover:bg-graphite"
-                >
-                  <Mail size={16} />
-                  Get Quote
+              <div className="absolute inset-0 bg-gradient-to-t from-[#071016] via-[#071016]/20 to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 p-5">
+                <h3 className="text-lg font-black uppercase text-white">{product.name}</h3>
+                <p className="mt-1 line-clamp-1 text-xs text-white/70">{product.description}</p>
+                <a href="#inquiry" className="mt-4 inline-flex items-center gap-2 text-xs font-black uppercase text-[#48a5ff]">
+                  View More
+                  <ArrowRight size={14} />
                 </a>
               </div>
             </article>
@@ -292,113 +401,156 @@ function ProductSeries() {
   );
 }
 
-function TrainingScenes({ content }: { content: SiteContent }) {
+function ProductCollections() {
   return (
-    <section className="relative overflow-hidden bg-ink py-24 text-white sm:py-32">
-      <Image
-        src={content.factoryShowcase.backgroundImage}
-        width={1600}
-        height={900}
-        alt=""
-        aria-hidden="true"
-        className="absolute inset-0 h-full w-full object-cover opacity-[0.16]"
-      />
-      <div className="absolute inset-0 bg-gradient-to-r from-ink/96 via-ink/86 to-ink/94" />
+    <section className="bg-[#f4f7fb] pb-7">
+      <div className="section-shell grid items-stretch gap-5 lg:grid-cols-2">
+        <ProductGridPanel title="Featured Products" items={featuredProducts} action="View All Products" />
+        <ProductGridPanel title="Kids Fitness Collection" items={kidsProducts} action="View More" />
+      </div>
+    </section>
+  );
+}
 
-      <div className="section-shell relative z-10 grid gap-12 lg:grid-cols-[0.8fr_1.35fr] lg:items-center">
-        <div className="reveal">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-volt">{content.factoryShowcase.eyebrow}</p>
-          <h2 className="mt-4 text-4xl font-semibold uppercase leading-tight sm:text-5xl">{content.factoryShowcase.title}</h2>
-          <div className="mt-8 grid gap-5">
-            {content.factoryShowcase.features.map((item) => {
-              const Icon = homeIcons[item.icon] || BadgeCheck;
-              return (
-                <article key={item.title} className="grid grid-cols-[auto_1fr] gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full border border-white/28 text-white">
-                    <Icon size={24} strokeWidth={1.8} />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold uppercase leading-tight">{item.title}</h3>
-                    <p className="mt-2 max-w-md text-sm leading-6 text-white/68">{item.description}</p>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-          <a
-            href="/about"
-            className="mt-9 inline-flex h-12 min-w-40 items-center justify-center rounded-[8px] bg-ocean px-6 text-sm font-bold uppercase tracking-[0.06em] text-white transition hover:bg-[#1671c9]"
+function ProductGridPanel({
+  title,
+  items,
+  action
+}: {
+  title: string;
+  items: Array<{ name: string; code?: string; image: string }>;
+  action: string;
+}) {
+  const placeholders = Array.from({ length: Math.max(0, 5 - items.length) });
+
+  return (
+    <section className="reveal flex h-full flex-col rounded-[8px] border border-line bg-white p-5 shadow-soft">
+      <div className="flex items-center justify-between gap-4">
+        <h2 className="text-lg font-black uppercase text-[#081422]">{title}</h2>
+        <a href="#inquiry" className="inline-flex items-center gap-2 text-xs font-black uppercase text-[#0d7cff]">
+          {action}
+          <ArrowRight size={14} />
+        </a>
+      </div>
+      <div className="mt-5 grid flex-1 grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-5">
+        {items.map((item) => (
+          <article
+            key={item.name}
+            className="flex min-h-[17rem] flex-col overflow-hidden rounded-[8px] border border-line bg-[#f8fafc] text-center transition hover:-translate-y-1 hover:shadow-soft"
           >
-            {content.factoryShowcase.buttonText}
-          </a>
-        </div>
-
-        <div className="reveal grid gap-3 sm:grid-cols-2">
-          {content.factoryShowcase.images.map((item) => (
-            <article key={item.title} className="group relative overflow-hidden rounded-[8px] bg-white/10">
-              <Image
-                src={item.image}
-                width={900}
-                height={520}
-                alt={`${item.title} factory photo`}
-                className="aspect-[16/9] h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
-              />
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/82 to-transparent px-5 pb-4 pt-14">
-                <h3 className="text-lg font-semibold text-white">{item.title}</h3>
-              </div>
-            </article>
-          ))}
-        </div>
+            <div className="h-40 w-full bg-white">
+              <Image src={item.image} width={420} height={320} alt={`${item.name} product`} className="h-full w-full object-cover" />
+            </div>
+            <div className="flex flex-1 flex-col justify-end p-3">
+              <h3 className="flex min-h-16 items-center justify-center text-sm font-bold leading-5 text-[#081422]">{item.name}</h3>
+              <p className="mt-1 min-h-5 text-xs font-semibold text-graphite">{item.code || "OEM"}</p>
+            </div>
+          </article>
+        ))}
+        {placeholders.map((_, index) => (
+          <div key={`placeholder-${index}`} aria-hidden="true" className="hidden rounded-[8px] border border-transparent xl:block" />
+        ))}
       </div>
     </section>
   );
 }
 
-function Specifications() {
+function TrustPanels() {
   return (
-    <section id="specs" className="bg-white py-24 sm:py-32">
-      <div className="section-shell grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
-        <div className="reveal">
-          <p className="eyebrow">Specifications</p>
-          <h2 className="mt-4 text-4xl font-semibold leading-tight text-ink sm:text-5xl">Ready for sampling and production.</h2>
-          <p className="mt-5 text-base leading-7 text-graphite">
-            Standard specifications can be adjusted by rope type, packaging plan and target order quantity.
-          </p>
-        </div>
-        <div className="reveal overflow-hidden rounded-[8px] border border-line">
-          <table className="w-full border-collapse text-left text-sm">
-            <tbody>
-              {specs.map(([item, detail]) => (
-                <tr key={item} className="border-b border-line last:border-0">
-                  <th className="w-36 bg-mist px-4 py-4 font-semibold text-ink sm:w-52 sm:px-6">{item}</th>
-                  <td className="px-4 py-4 leading-6 text-graphite sm:px-6">{detail}</td>
-                </tr>
+    <section className="bg-[#f4f7fb] pb-7">
+      <div className="section-shell grid gap-5 lg:grid-cols-3">
+        <article className="reveal rounded-[8px] border border-line bg-white p-6 shadow-soft">
+          <h2 className="text-lg font-black uppercase text-[#081422]">Trusted by Global Buyers</h2>
+          <div className="mt-5 grid grid-cols-3 gap-3">
+            {buyerTypes.map((type) => (
+              <div key={type} className="grid justify-items-center gap-2 rounded-[8px] bg-[#f8fafc] p-3 text-center">
+                <UsersRound size={23} className="text-[#0d7cff]" />
+                <p className="text-[0.68rem] font-bold leading-4 text-[#081422]">{type}</p>
+              </div>
+            ))}
+          </div>
+          <p className="mt-5 text-sm leading-6 text-graphite">We have long-term cooperation with customers from 100+ countries around the world.</p>
+        </article>
+
+        <article className="reveal rounded-[8px] border border-line bg-white p-6 shadow-soft">
+          <h2 className="text-lg font-black uppercase text-[#081422]">Certifications</h2>
+          <div className="mt-6 grid grid-cols-4 gap-3">
+            {["ISO", "BSCI", "CE", "RoHS"].map((cert) => (
+              <div key={cert} className="flex h-16 items-center justify-center rounded-[8px] border border-line bg-[#f8fafc] text-xl font-black text-[#081422]">
+                {cert}
+              </div>
+            ))}
+          </div>
+          <p className="mt-5 text-sm leading-6 text-graphite">Products meet international quality standards and can support export documentation needs.</p>
+        </article>
+
+        <article className="reveal relative overflow-hidden rounded-[8px] border border-line bg-white p-6 shadow-soft">
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#eaf3ff] to-transparent" />
+          <div className="pointer-events-none absolute -bottom-16 -right-14 h-48 w-48 rounded-full bg-[#0d7cff]/10 blur-2xl" />
+          <Ship className="pointer-events-none absolute bottom-7 right-7 text-[#0d7cff]/10" size={150} strokeWidth={1.4} />
+          <div className="relative z-10">
+            <h2 className="text-lg font-black uppercase text-[#081422]">Global Shipping</h2>
+            <div className="mt-5 grid grid-cols-3 gap-3">
+              {shippingMethods.map((method) => (
+                <div key={method} className="grid justify-items-center gap-2 rounded-[8px] bg-white/90 p-3 text-center">
+                  <Ship size={23} className="text-[#0d7cff]" />
+                  <p className="text-xs font-bold text-[#081422]">{method}</p>
+                </div>
               ))}
-            </tbody>
-          </table>
-        </div>
+            </div>
+          </div>
+        </article>
       </div>
     </section>
+  );
+}
+
+function FloatingContact({ content }: { content: SiteContent }) {
+  return (
+    <div className="fixed right-4 top-1/2 z-40 hidden -translate-y-1/2 overflow-hidden rounded-[8px] bg-[#0d7cff] shadow-[0_18px_40px_rgba(13,124,255,0.26)] lg:block">
+      <TrackedLink
+        href={getWhatsAppHref(undefined, content.brand.whatsapp)}
+        target="_blank"
+        rel="noreferrer"
+        eventProperties={{ contact_method: "whatsapp", location: "floating_contact" }}
+        className="flex w-20 flex-col items-center gap-1 border-b border-white/20 px-3 py-4 text-xs font-bold text-white transition hover:bg-white/10"
+      >
+        <MessageCircle size={22} />
+        WhatsApp
+      </TrackedLink>
+      <TrackedLink
+        href={`mailto:${content.brand.email}`}
+        eventProperties={{ contact_method: "email", location: "floating_contact" }}
+        className="flex w-20 flex-col items-center gap-1 border-b border-white/20 px-3 py-4 text-xs font-bold text-white transition hover:bg-white/10"
+      >
+        <Mail size={22} />
+        Email
+      </TrackedLink>
+      <a href="#inquiry" className="flex w-20 flex-col items-center gap-1 px-3 py-4 text-xs font-bold text-white transition hover:bg-white/10">
+        <FileText size={22} />
+        Get Quote
+      </a>
+    </div>
   );
 }
 
 function ServiceProcess({ content }: { content: SiteContent }) {
   return (
-    <section className="bg-white py-20 sm:py-24">
+    <section className="bg-white py-14 sm:py-16">
       <div className="section-shell">
         <div className="reveal mx-auto max-w-3xl text-center">
-          <h2 className="text-2xl font-bold uppercase leading-tight tracking-[0.02em] text-ink sm:text-3xl">
+          <h2 className="text-2xl font-black uppercase leading-tight tracking-[0.02em] text-[#081422] sm:text-3xl">
             {content.serviceProcess.title}
           </h2>
-          <div className="mx-auto mt-3 h-1 w-20 rounded-full bg-ocean" />
+          <div className="mx-auto mt-3 h-1 w-20 rounded-full bg-[#0d7cff]" />
         </div>
 
-        <div className="mt-12 hidden grid-cols-[minmax(0,1fr)_4rem_minmax(0,1fr)_4rem_minmax(0,1fr)_4rem_minmax(0,1fr)_4rem_minmax(0,1fr)] items-start gap-2 lg:grid">
+        <div className="mt-12 hidden grid-cols-5 items-start gap-10 lg:grid">
           {content.serviceProcess.steps.map((step, index) => (
-            <div key={`${step.number}-${step.title}`} className="contents">
+            <div key={`${step.number}-${step.title}`} className="relative">
               <ProcessStep step={step} />
               {index < content.serviceProcess.steps.length - 1 ? (
-                <div className="flex h-20 items-center justify-center pt-1 text-ocean">
+                <div className="absolute left-[calc(100%+0.9rem)] top-8 flex h-16 -translate-y-1/2 items-center justify-center text-[#0d7cff]">
                   <ArrowRight size={28} strokeWidth={2.2} />
                 </div>
               ) : null}
@@ -410,7 +562,7 @@ function ServiceProcess({ content }: { content: SiteContent }) {
           {content.serviceProcess.steps.map((step, index) => (
             <div key={`${step.number}-${step.title}`} className="reveal grid grid-cols-[auto_1fr] gap-4">
               <div className="flex flex-col items-center">
-                <div className="h-3 w-3 rounded-full bg-ocean" />
+                <div className="h-3 w-3 rounded-full bg-[#0d7cff]" />
                 {index < content.serviceProcess.steps.length - 1 ? <div className="mt-2 h-full min-h-16 w-px bg-line" /> : null}
               </div>
               <ProcessStep step={step} align="left" />
@@ -438,7 +590,7 @@ function ProcessStep({
       }`}
     >
       <div
-        className={`flex h-16 w-16 items-center justify-center text-ocean ${
+        className={`flex h-16 w-16 items-center justify-center text-[#0d7cff] ${
           align === "center" ? "mx-auto" : ""
         }`}
       >
@@ -569,7 +721,7 @@ function Footer({ content }: { content: SiteContent }) {
     { label: "About Us", href: "/about" },
     { label: "Products", href: "#products" },
     { label: "OEM/ODM", href: "#oem" },
-    { label: "Specifications", href: "#specs" },
+    { label: "Factory", href: "#factory" },
     { label: "Contact Us", href: "#inquiry" }
   ];
 
@@ -592,7 +744,7 @@ function Footer({ content }: { content: SiteContent }) {
             <a href="/" className="text-2xl font-black uppercase italic tracking-tight text-white sm:text-3xl">
               {content.brand.name}
             </a>
-            <p className="mt-6 max-w-sm text-sm leading-7 text-white/68">
+            <p className="mt-6 max-w-sm text-sm leading-7 text-white/70">
               {content.brand.name} is a professional OEM/ODM supplier for jump ropes, fitness accessories and wholesale private-label programs.
             </p>
             <div className="mt-7 flex items-center gap-3">
@@ -657,11 +809,11 @@ function Footer({ content }: { content: SiteContent }) {
                 id="footer-email"
                 type="email"
                 placeholder="Your email address"
-                className="h-11 rounded-[8px] border border-white/14 bg-white px-4 text-sm text-ink outline-none transition placeholder:text-graphite/70 focus:border-ocean"
+                className="h-11 rounded-[8px] border border-white/15 bg-white px-4 text-sm text-ink outline-none transition placeholder:text-graphite/70 focus:border-[#0d7cff]"
               />
               <button
                 type="button"
-                className="h-11 rounded-[8px] bg-ocean px-5 text-sm font-bold uppercase tracking-[0.08em] text-white transition hover:bg-[#1671c9]"
+                className="h-11 rounded-[8px] bg-[#0d7cff] px-5 text-sm font-bold uppercase tracking-[0.08em] text-white transition hover:bg-[#006be6]"
               >
                 Subscribe
               </button>
@@ -669,7 +821,7 @@ function Footer({ content }: { content: SiteContent }) {
           </FooterColumn>
         </div>
 
-        <div className="mt-12 border-t border-white/10 pt-6 text-center text-sm text-white/56">
+        <div className="mt-12 border-t border-white/10 pt-6 text-center text-sm text-white/60">
           © 2026 {content.brand.name}. All Rights Reserved.
         </div>
       </div>
@@ -697,7 +849,7 @@ function FooterSocialLink({ href, label, children }: { href: string; label: stri
       aria-label={label}
       title={label}
       eventProperties={{ contact_method: label.toLowerCase(), location: "footer" }}
-      className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/14 bg-white/8 text-white/82 transition hover:-translate-y-0.5 hover:border-ocean hover:bg-ocean hover:text-white"
+      className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/10 text-white/80 transition hover:-translate-y-0.5 hover:border-[#0d7cff] hover:bg-[#0d7cff] hover:text-white"
     >
       {children}
     </TrackedLink>
