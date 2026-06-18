@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createInquiry } from "@/lib/inquiry-store";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { sendInquiryNotification } from "@/lib/mail";
+import { createTikTokEventIds, sendTikTokInquiryEvents } from "@/lib/tiktok-server-events";
 import { validateInquiryPayload } from "@/lib/validation";
 
 export async function POST(request: NextRequest) {
@@ -22,13 +23,27 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    const tiktokEventIds = createTikTokEventIds();
+
     await createInquiry(result.data);
 
     await sendInquiryNotification(result.data).catch((error) => {
       console.error("Inquiry notification failed", error);
     });
 
-    return NextResponse.json({ success: true, message: "Inquiry submitted successfully" });
+    await sendTikTokInquiryEvents({
+      eventIds: tiktokEventIds,
+      inquiry: result.data,
+      request
+    }).catch((error) => {
+      console.error("TikTok server event failed", error);
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: "Inquiry submitted successfully",
+      eventIds: tiktokEventIds
+    });
   } catch (error) {
     console.error("Inquiry submission failed", error);
     return NextResponse.json({ success: false, message: "Unable to submit inquiry right now." }, { status: 500 });

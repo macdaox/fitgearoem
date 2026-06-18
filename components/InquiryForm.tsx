@@ -27,14 +27,27 @@ export function InquiryForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
-      const result = (await response.json()) as { success: boolean; message: string };
+      const result = (await response.json()) as {
+        success: boolean;
+        message: string;
+        eventIds?: {
+          submitForm?: string;
+          lead?: string;
+        };
+      };
 
       if (!response.ok || !result.success) {
         throw new Error(result.message || "Submission failed.");
       }
 
-      trackTikTokEvent("SubmitForm", { form_name: "Wholesale Inquiry" });
-      trackTikTokEvent("Lead", { form_name: "Wholesale Inquiry" });
+      trackTikTokEvent("SubmitForm", {
+        form_name: "Wholesale Inquiry",
+        event_id: result.eventIds?.submitForm
+      });
+      trackTikTokEvent("Lead", {
+        form_name: "Wholesale Inquiry",
+        event_id: result.eventIds?.lead
+      });
 
       form.reset();
       setState("success");
