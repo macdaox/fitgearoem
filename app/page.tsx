@@ -32,10 +32,7 @@ import { InquiryForm } from "@/components/InquiryForm";
 import { ScrollAnimations } from "@/components/ScrollAnimations";
 import { TrackedLink } from "@/components/TrackedLink";
 import { getSiteContent, type HomeIconName, type SiteContent } from "@/lib/site-content";
-import {
-  getWhatsAppHref,
-  products
-} from "@/lib/site-data";
+import { getWhatsAppHref } from "@/lib/site-data";
 
 export const dynamic = "force-dynamic";
 
@@ -67,22 +64,6 @@ const oemServiceItems = [
   { label: "Quality Testing", icon: ShieldCheck }
 ];
 
-const featuredProducts = [
-  { name: "Speed Jump Rope", code: "T003", image: "/images/hero-jump-rope.jpg" },
-  { name: "Digital Jump Rope", code: "H801S", image: "/images/detail-grip.png" },
-  { name: "Smart Jump Rope", code: "T001", image: "/images/speed-rope-blue.png" },
-  { name: "Massage Gun", code: "T023", image: "/images/Massage gun.png" },
-  { name: "Massage Stick", code: "T028", image: "/images/weighted-rope.jpg" }
-];
-
-const kidsProducts = [
-  { name: "Duck Jump Rope", image: "/images/kids-rope.jpg" },
-  { name: "Bear Jump Rope", image: "/images/pair-series.png" },
-  { name: "Ice Cream Jump Rope", image: "/images/speed-rope-blue.png" },
-  { name: "Colorful Bamboo Rope", image: "/images/oem-colors.png" },
-  { name: "Kids Training Rope", image: "/images/speed-rope-pink.jpg" }
-];
-
 const buyerTypes = ["Fitness Brands", "Amazon Sellers", "Distributors", "Gym Chains", "Sports Stores", "Boxing Clubs"];
 
 const shippingMethods = ["FOB", "EXW", "DDP", "Sea Freight", "Air Freight", "Express"];
@@ -97,8 +78,8 @@ export default async function Home() {
       <Hero content={content} />
       <FactoryShowcase content={content} />
       <OemServiceBand content={content} />
-      <ProductSeries />
-      <ProductCollections />
+      <ProductSeries content={content} />
+      <ProductCollections content={content} />
       <TrustPanels />
       <ServiceProcess content={content} />
       <InquirySection content={content} />
@@ -365,17 +346,17 @@ function OemServiceBand({ content }: { content: SiteContent }) {
   );
 }
 
-function ProductSeries() {
+function ProductSeries({ content }: { content: SiteContent }) {
   return (
     <section id="products" className="bg-[#f4f7fb] pb-7">
       <div className="section-shell">
         <div className="reveal text-center">
-          <h2 className="text-2xl font-black uppercase tracking-tight text-[#081422]">Our Product Categories</h2>
+          <h2 className="text-2xl font-black uppercase tracking-tight text-[#081422]">{content.homeProducts.categoriesTitle}</h2>
           <div className="mx-auto mt-3 h-1 w-20 rounded-full bg-[#0d7cff]" />
         </div>
 
         <div className="mt-6 grid gap-2 md:grid-cols-3 xl:grid-cols-5">
-          {products.map((product) => (
+          {content.homeProducts.categories.map((product) => (
             <article key={product.name} className="reveal group relative overflow-hidden rounded-[8px] bg-[#071016] shadow-soft">
               <Image
                 src={product.image}
@@ -401,12 +382,20 @@ function ProductSeries() {
   );
 }
 
-function ProductCollections() {
+function ProductCollections({ content }: { content: SiteContent }) {
   return (
     <section className="bg-[#f4f7fb] pb-7">
       <div className="section-shell grid items-stretch gap-5 lg:grid-cols-2">
-        <ProductGridPanel title="Featured Products" items={featuredProducts} action="View All Products" />
-        <ProductGridPanel title="Kids Fitness Collection" items={kidsProducts} action="View More" />
+        <ProductGridPanel
+          title={content.homeProducts.featuredTitle}
+          items={content.homeProducts.featuredItems}
+          action={content.homeProducts.featuredAction}
+        />
+        <ProductGridPanel
+          title={content.homeProducts.kidsTitle}
+          items={content.homeProducts.kidsItems}
+          action={content.homeProducts.kidsAction}
+        />
       </div>
     </section>
   );
@@ -769,7 +758,7 @@ function Footer({ content }: { content: SiteContent }) {
           </FooterColumn>
 
           <FooterColumn title="Products">
-            {products.map((product) => (
+            {content.homeProducts.categories.map((product) => (
               <a key={product.name} href="#products" className="footer-link">
                 {product.name}
               </a>

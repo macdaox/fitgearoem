@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { TrackedLink } from "@/components/TrackedLink";
 import { getSiteContent, type SiteContent } from "@/lib/site-content";
-import { getWhatsAppHref, products } from "@/lib/site-data";
+import { getWhatsAppHref } from "@/lib/site-data";
 
 export const dynamic = "force-dynamic";
 
@@ -342,7 +342,7 @@ function AboutFooter({ content }: { content: SiteContent }) {
           </AboutFooterColumn>
 
           <AboutFooterColumn title="Products">
-            {products.map((product) => (
+            {content.homeProducts.categories.map((product) => (
               <a key={product.name} href="/#products" className="footer-link">
                 {product.name}
               </a>

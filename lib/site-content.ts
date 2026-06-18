@@ -87,6 +87,28 @@ export type SiteContent = {
       image: string;
     }>;
   };
+  homeProducts: {
+    categoriesTitle: string;
+    categories: Array<{
+      name: string;
+      description: string;
+      image: string;
+    }>;
+    featuredTitle: string;
+    featuredAction: string;
+    featuredItems: Array<{
+      name: string;
+      code: string;
+      image: string;
+    }>;
+    kidsTitle: string;
+    kidsAction: string;
+    kidsItems: Array<{
+      name: string;
+      code: string;
+      image: string;
+    }>;
+  };
   about: {
     eyebrow: string;
     title: string;
@@ -254,6 +276,54 @@ export const defaultSiteContent: SiteContent = {
       { title: "Shipping", image: "/images/pair-series.jpg" }
     ]
   },
+  homeProducts: {
+    categoriesTitle: "Our Product Categories",
+    categories: [
+      {
+        name: "Speed Jump Rope",
+        description: "Fast rotation, light cable and precise grip for cardio training.",
+        image: "/images/hero-jump-rope.jpg"
+      },
+      {
+        name: "Boxing Jump Rope",
+        description: "Balanced rope feel for footwork drills and boxing club programs.",
+        image: "/images/detail-grip.jpg"
+      },
+      {
+        name: "Weighted Jump Rope",
+        description: "Training-focused build for strength, conditioning and retail bundles.",
+        image: "/images/weighted-rope.jpg"
+      },
+      {
+        name: "Kids Jump Rope",
+        description: "Soft colors and adjustable length for school sports and youth fitness.",
+        image: "/images/kids-rope.jpg"
+      },
+      {
+        name: "Custom OEM Jump Rope",
+        description: "Private label rope sets with custom colors, packaging and accessories.",
+        image: "/images/product-pack.jpg"
+      }
+    ],
+    featuredTitle: "Featured Products",
+    featuredAction: "View All Products",
+    featuredItems: [
+      { name: "Speed Jump Rope", code: "T003", image: "/images/hero-jump-rope.jpg" },
+      { name: "Digital Jump Rope", code: "H801S", image: "/images/detail-grip.png" },
+      { name: "Smart Jump Rope", code: "T001", image: "/images/speed-rope-blue.png" },
+      { name: "Massage Gun", code: "T023", image: "/images/Massage gun.png" },
+      { name: "Massage Stick", code: "T028", image: "/images/weighted-rope.jpg" }
+    ],
+    kidsTitle: "Kids Fitness Collection",
+    kidsAction: "View More",
+    kidsItems: [
+      { name: "Duck Jump Rope", code: "OEM", image: "/images/kids-rope.jpg" },
+      { name: "Bear Jump Rope", code: "OEM", image: "/images/pair-series.png" },
+      { name: "Ice Cream Jump Rope", code: "OEM", image: "/images/speed-rope-blue.png" },
+      { name: "Colorful Bamboo Rope", code: "OEM", image: "/images/oem-colors.png" },
+      { name: "Kids Training Rope", code: "OEM", image: "/images/speed-rope-pink.jpg" }
+    ]
+  },
   about: {
     eyebrow: "About Us",
     title: "Fitness supply built for brands that move fast.",
@@ -395,6 +465,13 @@ function mergeContent(defaults: SiteContent, value: Partial<SiteContent>): SiteC
       ...value.factoryShowcase,
       features: normalizeObjectList(value.factoryShowcase?.features, defaults.factoryShowcase.features),
       images: normalizeObjectList(value.factoryShowcase?.images, defaults.factoryShowcase.images)
+    },
+    homeProducts: {
+      ...defaults.homeProducts,
+      ...value.homeProducts,
+      categories: normalizeObjectList(value.homeProducts?.categories, defaults.homeProducts.categories),
+      featuredItems: normalizeObjectList(value.homeProducts?.featuredItems, defaults.homeProducts.featuredItems),
+      kidsItems: normalizeObjectList(value.homeProducts?.kidsItems, defaults.homeProducts.kidsItems)
     },
     about: {
       ...defaults.about,

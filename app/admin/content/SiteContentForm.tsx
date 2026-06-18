@@ -273,6 +273,71 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
         </div>
       </Section>
 
+      <Section title="首页产品展示">
+        <div className="grid gap-5">
+          <div className="rounded-[8px] border border-line bg-mist p-4">
+            <TextField
+              label="产品分类模块标题"
+              value={content.homeProducts.categoriesTitle}
+              onChange={(value) => setDeepValue("homeProducts.categoriesTitle", value)}
+            />
+            <div className="mt-4 grid gap-4">
+              {content.homeProducts.categories.map((item, index) => (
+                <div key={index} className="rounded-[8px] border border-line bg-white p-4">
+                  <p className="mb-4 text-sm font-semibold text-ink">分类卡片 {index + 1}</p>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <TextField
+                      label="分类名称"
+                      value={item.name}
+                      onChange={(value) => setDeepValue(`homeProducts.categories.${index}.name`, value)}
+                    />
+                    <ImageField
+                      label="分类图片"
+                      value={item.image}
+                      onChange={(url) => updateImage(`homeProducts.categories.${index}.image`, url)}
+                      hint="建议尺寸：900 x 620px 或 1200 x 820px，横版。用于上方深色产品分类卡片。"
+                    />
+                    <div className="md:col-span-2">
+                      <TextareaField
+                        label="分类描述"
+                        value={item.description}
+                        onChange={(value) => setDeepValue(`homeProducts.categories.${index}.description`, value)}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <ProductListEditor
+            title="精选产品"
+            titleValue={content.homeProducts.featuredTitle}
+            actionValue={content.homeProducts.featuredAction}
+            titlePath="homeProducts.featuredTitle"
+            actionPath="homeProducts.featuredAction"
+            items={content.homeProducts.featuredItems}
+            itemPath="homeProducts.featuredItems"
+            setDeepValue={setDeepValue}
+            updateImage={updateImage}
+            imageHint="建议尺寸：600 x 780px 或 900 x 1170px，竖版 10:13。用于下方产品小卡片上半部分。"
+          />
+
+          <ProductListEditor
+            title="儿童跳绳系列"
+            titleValue={content.homeProducts.kidsTitle}
+            actionValue={content.homeProducts.kidsAction}
+            titlePath="homeProducts.kidsTitle"
+            actionPath="homeProducts.kidsAction"
+            items={content.homeProducts.kidsItems}
+            itemPath="homeProducts.kidsItems"
+            setDeepValue={setDeepValue}
+            updateImage={updateImage}
+            imageHint="建议尺寸：600 x 780px 或 900 x 1170px，竖版 10:13。用于儿童系列小卡片。"
+          />
+        </div>
+      </Section>
+
       <Section title="询盘区文案">
         <div className="grid gap-4">
           <TextField label="小标题" value={content.inquiry.eyebrow} onChange={(value) => setDeepValue("inquiry.eyebrow", value)} />
@@ -427,6 +492,57 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
           <Save size={18} />
           {saving ? "保存中..." : "保存网站内容"}
         </button>
+      </div>
+    </div>
+  );
+}
+
+function ProductListEditor({
+  title,
+  titleValue,
+  actionValue,
+  titlePath,
+  actionPath,
+  items,
+  itemPath,
+  imageHint,
+  setDeepValue,
+  updateImage
+}: {
+  title: string;
+  titleValue: string;
+  actionValue: string;
+  titlePath: string;
+  actionPath: string;
+  items: SiteContent["homeProducts"]["featuredItems"];
+  itemPath: string;
+  imageHint: string;
+  setDeepValue: (path: string, value: string) => void;
+  updateImage: (path: string, url: string) => void;
+}) {
+  return (
+    <div className="rounded-[8px] border border-line bg-mist p-4">
+      <p className="mb-4 text-sm font-semibold text-ink">{title}</p>
+      <div className="grid gap-4 md:grid-cols-2">
+        <TextField label="模块标题" value={titleValue} onChange={(value) => setDeepValue(titlePath, value)} />
+        <TextField label="右上角按钮文字" value={actionValue} onChange={(value) => setDeepValue(actionPath, value)} />
+      </div>
+      <div className="mt-4 grid gap-4">
+        {items.map((item, index) => (
+          <div key={index} className="rounded-[8px] border border-line bg-white p-4">
+            <p className="mb-4 text-sm font-semibold text-ink">产品卡片 {index + 1}</p>
+            <div className="grid gap-4 md:grid-cols-3">
+              <TextField label="产品名称" value={item.name} onChange={(value) => setDeepValue(`${itemPath}.${index}.name`, value)} />
+              <TextField label="型号/标签" value={item.code} onChange={(value) => setDeepValue(`${itemPath}.${index}.code`, value)} />
+              <ImageField
+                label="产品图片"
+                value={item.image}
+                onChange={(url) => updateImage(`${itemPath}.${index}.image`, url)}
+                hint={imageHint}
+              />
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
