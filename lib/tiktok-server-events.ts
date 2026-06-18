@@ -138,25 +138,16 @@ function buildTikTokPage(request: NextRequest): TikTokServerEventPayload["page"]
 }
 
 function buildTikTokProperties(inquiry: InquiryPayload): TikTokServerEventPayload["properties"] {
+  const productName = inquiry.productInterest || "Wholesale Inquiry";
+
   return {
-    content_id: inquiry.productInterest || "wholesale-inquiry",
-    content_name: inquiry.productInterest || "Wholesale Inquiry",
+    content_id: productName,
+    content_name: productName,
     content_type: "product",
     currency: "USD",
-    value: estimateInquiryValue(inquiry.quantity),
-    description: `Country: ${inquiry.country || "-"}; Quantity: ${inquiry.quantity || "-"}`
+    value: 1,
+    description: `Product inquiry submitted; WhatsApp: ${inquiry.whatsapp ? "provided" : "not provided"}`
   };
-}
-
-function estimateInquiryValue(quantity: string | undefined) {
-  const raw = quantity?.replace(/[^\d.]/g, "") || "";
-  const quantityNumber = Number.parseFloat(raw);
-
-  if (!Number.isFinite(quantityNumber) || quantityNumber <= 0) {
-    return 1;
-  }
-
-  return Math.max(1, Math.round(quantityNumber));
 }
 
 function getClientIp(request: NextRequest) {

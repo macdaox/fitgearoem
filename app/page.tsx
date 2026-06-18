@@ -28,6 +28,7 @@ import {
   UsersRound,
   Wrench,
 } from "lucide-react";
+import { FooterSubscribeForm } from "@/components/FooterSubscribeForm";
 import { InquiryForm } from "@/components/InquiryForm";
 import { ScrollAnimations } from "@/components/ScrollAnimations";
 import { TrackedLink } from "@/components/TrackedLink";
@@ -790,23 +791,7 @@ function Footer({ content }: { content: SiteContent }) {
 
           <FooterColumn title="Newsletter">
             <p className="text-sm leading-6 text-white/70">Subscribe to get product updates and OEM supply notes.</p>
-            <form className="mt-5 grid gap-3">
-              <label className="sr-only" htmlFor="footer-email">
-                Email address
-              </label>
-              <input
-                id="footer-email"
-                type="email"
-                placeholder="Your email address"
-                className="h-11 rounded-[8px] border border-white/15 bg-white px-4 text-sm text-ink outline-none transition placeholder:text-graphite/70 focus:border-[#0d7cff]"
-              />
-              <button
-                type="button"
-                className="h-11 rounded-[8px] bg-[#0d7cff] px-5 text-sm font-bold uppercase tracking-[0.08em] text-white transition hover:bg-[#006be6]"
-              >
-                Subscribe
-              </button>
-            </form>
+            <FooterSubscribeForm />
           </FooterColumn>
         </div>
 

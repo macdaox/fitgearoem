@@ -27,6 +27,19 @@ const homeIconOptions: Array<{ value: HomeIconName; label: string }> = [
   { value: "truck", label: "物流/发货" }
 ];
 
+const contentSections = [
+  { id: "brand", label: "品牌与联系方式", helper: "邮箱、社媒、WhatsApp" },
+  { id: "hero", label: "首页 Hero", helper: "首屏标题和大图" },
+  { id: "details", label: "五张全屏图", helper: "轮播大图和文案" },
+  { id: "stats", label: "首页数据亮点", helper: "工厂数据统计栏" },
+  { id: "factory", label: "工厂实力模块", helper: "工厂图和优势" },
+  { id: "oem", label: "OEM 定制模块", helper: "定制服务内容" },
+  { id: "products", label: "首页产品展示", helper: "分类和产品卡片" },
+  { id: "inquiry", label: "询盘区文案", helper: "表单旁边的文字" },
+  { id: "process", label: "服务流程", helper: "合作流程步骤" },
+  { id: "about", label: "关于我们页面", helper: "About 页面内容" }
+];
+
 export function SiteContentForm({ initialContent }: { initialContent: SiteContent }) {
   const [content, setContent] = useState(initialContent);
   const [message, setMessage] = useState("");
@@ -76,8 +89,55 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
   }
 
   return (
-    <div className="grid gap-5">
-      <Section title="品牌与联系方式">
+    <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)] lg:items-start">
+      <aside className="sticky top-6 hidden rounded-[8px] border border-line bg-white p-4 shadow-soft lg:block">
+        <div className="border-b border-line pb-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-ocean">Content CMS</p>
+          <h2 className="mt-2 text-xl font-semibold text-ink">内容分区</h2>
+          <p className="mt-2 text-sm leading-6 text-graphite">点击左侧模块，右侧快速定位编辑区域。</p>
+        </div>
+        <nav className="mt-3 grid gap-1">
+          {contentSections.map((section) => (
+            <a
+              key={section.id}
+              href={`#${section.id}`}
+              className="group rounded-[8px] px-3 py-3 transition hover:bg-mist"
+            >
+              <span className="block text-sm font-semibold text-ink group-hover:text-ocean">{section.label}</span>
+              <span className="mt-1 block text-xs text-graphite">{section.helper}</span>
+            </a>
+          ))}
+        </nav>
+      </aside>
+
+      <div className="min-w-0">
+        <div className="mb-5 rounded-[8px] border border-line bg-white p-4 shadow-soft lg:hidden">
+          <label className="grid gap-2 text-sm font-medium text-graphite">
+            内容分区
+            <select
+              className="h-11 rounded-[8px] border border-line bg-white px-3 text-ink outline-none focus:border-ocean"
+              defaultValue=""
+              onChange={(event) => {
+                if (event.target.value) {
+                  window.location.hash = event.target.value;
+                  event.target.value = "";
+                }
+              }}
+            >
+              <option value="" disabled>
+                选择要编辑的模块
+              </option>
+              {contentSections.map((section) => (
+                <option key={section.id} value={section.id}>
+                  {section.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+
+        <div className="grid gap-6">
+      <Section id="brand" title="品牌与联系方式">
         <div className="grid gap-4 md:grid-cols-2">
           <TextField label="品牌名" value={content.brand.name} onChange={(value) => setDeepValue("brand.name", value)} />
           <TextField label="邮箱" value={content.brand.email} onChange={(value) => setDeepValue("brand.email", value)} />
@@ -88,7 +148,7 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
         </div>
       </Section>
 
-      <Section title="首页 Hero">
+      <Section id="hero" title="首页 Hero">
         <div className="grid gap-4">
           <TextField label="小标题" value={content.hero.eyebrow} onChange={(value) => setDeepValue("hero.eyebrow", value)} />
           <TextField label="主标题" value={content.hero.title} onChange={(value) => setDeepValue("hero.title", value)} />
@@ -108,7 +168,7 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
         </div>
       </Section>
 
-      <Section title="五张全屏图模块">
+      <Section id="details" title="五张全屏图模块">
         <div className="grid gap-4">
           <TextField label="模块小标题" value={content.detailsIntro.eyebrow} onChange={(value) => setDeepValue("detailsIntro.eyebrow", value)} />
           <TextField label="模块标题" value={content.detailsIntro.title} onChange={(value) => setDeepValue("detailsIntro.title", value)} />
@@ -144,7 +204,7 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
         </div>
       </Section>
 
-      <Section title="首页数据亮点">
+      <Section id="stats" title="首页数据亮点">
         <div className="grid gap-4">
           <TextField label="模块小标题" value={content.homeStats.eyebrow} onChange={(value) => setDeepValue("homeStats.eyebrow", value)} />
           {content.homeStats.items.map((item, index) => (
@@ -165,7 +225,7 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
         </div>
       </Section>
 
-      <Section title="工厂实力模块">
+      <Section id="factory" title="工厂实力模块">
         <div className="grid gap-4">
           <TextField
             label="小标题"
@@ -242,7 +302,7 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
         </div>
       </Section>
 
-      <Section title="OEM 定制模块">
+      <Section id="oem" title="OEM 定制模块">
         <div className="grid gap-4">
           <TextField label="小标题" value={content.oem.eyebrow} onChange={(value) => setDeepValue("oem.eyebrow", value)} />
           <TextField label="标题" value={content.oem.title} onChange={(value) => setDeepValue("oem.title", value)} />
@@ -273,7 +333,7 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
         </div>
       </Section>
 
-      <Section title="首页产品展示">
+      <Section id="products" title="首页产品展示">
         <div className="grid gap-5">
           <div className="rounded-[8px] border border-line bg-mist p-4">
             <TextField
@@ -338,7 +398,7 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
         </div>
       </Section>
 
-      <Section title="询盘区文案">
+      <Section id="inquiry" title="询盘区文案">
         <div className="grid gap-4">
           <TextField label="小标题" value={content.inquiry.eyebrow} onChange={(value) => setDeepValue("inquiry.eyebrow", value)} />
           <TextField label="标题" value={content.inquiry.title} onChange={(value) => setDeepValue("inquiry.title", value)} />
@@ -346,7 +406,7 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
         </div>
       </Section>
 
-      <Section title="服务流程">
+      <Section id="process" title="服务流程">
         <div className="grid gap-4">
           <TextField label="模块标题" value={content.serviceProcess.title} onChange={(value) => setDeepValue("serviceProcess.title", value)} />
           {content.serviceProcess.steps.map((step, index) => (
@@ -372,7 +432,7 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
         </div>
       </Section>
 
-      <Section title="关于我们页面">
+      <Section id="about" title="关于我们页面">
         <div className="grid gap-4">
           <TextField label="页面小标题" value={content.about.eyebrow} onChange={(value) => setDeepValue("about.eyebrow", value)} />
           <TextField label="页面主标题" value={content.about.title} onChange={(value) => setDeepValue("about.title", value)} />
@@ -481,17 +541,19 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
         </div>
       </Section>
 
-      <div className="sticky bottom-4 z-20 flex flex-col gap-3 rounded-[8px] border border-line bg-white/90 p-4 shadow-soft backdrop-blur sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm text-graphite">{message || "修改后点击保存，前台会读取最新内容。"}</p>
-        <button
-          type="button"
-          onClick={save}
-          disabled={saving}
-          className="inline-flex h-11 items-center justify-center gap-2 rounded-[8px] bg-ink px-5 text-sm font-semibold text-white transition hover:bg-graphite disabled:opacity-60"
-        >
-          <Save size={18} />
-          {saving ? "保存中..." : "保存网站内容"}
-        </button>
+          <div className="sticky bottom-4 z-20 flex flex-col gap-3 rounded-[8px] border border-line bg-white/90 p-4 shadow-soft backdrop-blur sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm text-graphite">{message || "修改后点击保存，前台会读取最新内容。"}</p>
+            <button
+              type="button"
+              onClick={save}
+              disabled={saving}
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-[8px] bg-ink px-5 text-sm font-semibold text-white transition hover:bg-graphite disabled:opacity-60"
+            >
+              <Save size={18} />
+              {saving ? "保存中..." : "保存网站内容"}
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -531,15 +593,19 @@ function ProductListEditor({
         {items.map((item, index) => (
           <div key={index} className="rounded-[8px] border border-line bg-white p-4">
             <p className="mb-4 text-sm font-semibold text-ink">产品卡片 {index + 1}</p>
-            <div className="grid gap-4 md:grid-cols-3">
-              <TextField label="产品名称" value={item.name} onChange={(value) => setDeepValue(`${itemPath}.${index}.name`, value)} />
-              <TextField label="型号/标签" value={item.code} onChange={(value) => setDeepValue(`${itemPath}.${index}.code`, value)} />
-              <ImageField
-                label="产品图片"
-                value={item.image}
-                onChange={(url) => updateImage(`${itemPath}.${index}.image`, url)}
-                hint={imageHint}
-              />
+            <div className="grid gap-4 xl:grid-cols-[minmax(0,0.95fr)_minmax(360px,1.05fr)]">
+              <div className="grid content-start gap-4 md:grid-cols-2 xl:grid-cols-1">
+                <TextField label="产品名称" value={item.name} onChange={(value) => setDeepValue(`${itemPath}.${index}.name`, value)} />
+                <TextField label="型号/标签" value={item.code} onChange={(value) => setDeepValue(`${itemPath}.${index}.code`, value)} />
+              </div>
+              <div className="min-w-0">
+                <ImageField
+                  label="产品图片"
+                  value={item.image}
+                  onChange={(url) => updateImage(`${itemPath}.${index}.image`, url)}
+                  hint={imageHint}
+                />
+              </div>
             </div>
           </div>
         ))}
@@ -585,9 +651,9 @@ function parseLines(value: string) {
     .filter(Boolean);
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-[8px] border border-line bg-white p-5 shadow-soft">
+    <section id={id} className="scroll-mt-6 rounded-[8px] border border-line bg-white p-5 shadow-soft">
       <h2 className="mb-5 text-xl font-semibold text-ink">{title}</h2>
       {children}
     </section>
@@ -712,13 +778,13 @@ function ImageField({
     <div className="grid gap-2 text-sm font-medium text-graphite">
       <span>{label}</span>
       {hint ? <span className="text-xs font-normal leading-5 text-graphite">{hint}</span> : null}
-      <div className="grid gap-3 lg:grid-cols-[1fr_auto]">
+      <div className="grid min-w-0 gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
         <input
           value={value}
           onChange={(event) => onChange(event.target.value)}
-          className="h-11 rounded-[8px] border border-line bg-white px-3 text-ink outline-none focus:border-ocean"
+          className="min-w-0 h-11 rounded-[8px] border border-line bg-white px-3 text-ink outline-none focus:border-ocean"
         />
-        <label className="inline-flex h-11 cursor-pointer items-center justify-center gap-2 rounded-[8px] border border-line bg-white px-4 text-sm font-semibold text-ink transition hover:border-ink">
+        <label className="inline-flex h-11 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-[8px] border border-line bg-white px-4 text-sm font-semibold text-ink transition hover:border-ink">
           <ImageUp size={18} />
           {uploading ? "上传中..." : "上传图片"}
           <input
@@ -735,9 +801,9 @@ function ImageField({
         </label>
       </div>
       {value ? (
-        <div className="overflow-hidden rounded-[8px] border border-line bg-mist">
+        <div className="max-w-full overflow-hidden rounded-[8px] border border-line bg-mist">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={value} alt={`${label} preview`} className="max-h-48 w-full object-cover" />
+          <img src={value} alt={`${label} preview`} className="aspect-video max-h-52 w-full object-cover" />
         </div>
       ) : null}
       {message ? <span className="text-xs font-normal text-graphite">{message}</span> : null}

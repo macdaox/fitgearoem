@@ -25,7 +25,7 @@ export function validateInquiryPayload(input: unknown): { ok: true; data: Inquir
 
   const source = input as Record<string, unknown>;
   const data = {
-    name: clean(source.name, 120),
+    name: clean(source.name, 120) || "Website Inquiry",
     email: clean(source.email, 180).toLowerCase(),
     whatsapp: clean(source.whatsapp, 80),
     country: clean(source.country, 100),
@@ -34,8 +34,8 @@ export function validateInquiryPayload(input: unknown): { ok: true; data: Inquir
     message: clean(source.message, 1500)
   };
 
-  if (!data.name || !data.email || !data.message) {
-    return { ok: false, message: "Name, email and message are required." };
+  if (!data.email || !data.message) {
+    return { ok: false, message: "Email and message are required." };
   }
 
   if (!emailPattern.test(data.email)) {

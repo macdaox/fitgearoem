@@ -14,12 +14,9 @@ export async function sendInquiryNotification(inquiry: InquiryPayload) {
     to: process.env.ADMIN_EMAIL,
     subject: `New Wholesale Inquiry from ${inquiry.name}`,
     text: [
-      `Name: ${inquiry.name}`,
       `Email: ${inquiry.email}`,
       `WhatsApp: ${inquiry.whatsapp || "-"}`,
-      `Country: ${inquiry.country || "-"}`,
       `Product Interest: ${inquiry.productInterest || "-"}`,
-      `Quantity: ${inquiry.quantity || "-"}`,
       `Message: ${inquiry.message}`,
       `Submit Time: ${submittedAt}`
     ].join("\n")

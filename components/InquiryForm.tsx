@@ -61,29 +61,24 @@ export function InquiryForm() {
   return (
     <form onSubmit={handleSubmit} className="grid gap-4 rounded-[8px] bg-white p-5 shadow-soft sm:p-7">
       <div className="grid gap-4 md:grid-cols-2">
-        <Field label="Name" name="name" required />
         <Field label="Email" name="email" type="email" required />
         <Field label="WhatsApp" name="whatsapp" />
-        <Field label="Country" name="country" />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <label className="grid gap-2 text-sm font-medium text-graphite">
-          Product Interest
-          <select
-            name="productInterest"
-            className="h-12 rounded-[8px] border border-line bg-white px-3 text-ink outline-none transition focus:border-ocean"
-          >
-            <option value="">Select a product</option>
-            {products.map((product) => (
-              <option key={product.name} value={product.name}>
-                {product.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <Field label="Quantity" name="quantity" placeholder="e.g. 1,000 pcs" />
-      </div>
+      <label className="grid gap-2 text-sm font-medium text-graphite">
+        Product Interest
+        <select
+          name="productInterest"
+          className="h-12 rounded-[8px] border border-line bg-white px-3 text-ink outline-none transition focus:border-ocean"
+        >
+          <option value="">Select a product</option>
+          {products.map((product) => (
+            <option key={product.name} value={product.name}>
+              {product.name}
+            </option>
+          ))}
+        </select>
+      </label>
 
       <label className="grid gap-2 text-sm font-medium text-graphite">
         Message
