@@ -33,6 +33,14 @@ export type SiteContent = {
     image: string;
     imagePosition: string;
   };
+  promo: {
+    eyebrow: string;
+    title: string;
+    description: string;
+    image: string;
+    imagePosition: string;
+    buttonText: string;
+  };
   detailsIntro: {
     eyebrow: string;
     title: string;
@@ -167,6 +175,14 @@ export const defaultSiteContent: SiteContent = {
     description: "Professional jump ropes for fitness brands, gyms, boxing clubs and wholesale buyers.",
     image: "/images/hero-jump-rope.jpg",
     imagePosition: "68% 50%"
+  },
+  promo: {
+    eyebrow: "Factory Direct OEM",
+    title: "Build your fitness brand with factory-direct manufacturing",
+    description: "OEM / ODM jump ropes, kids ropes, massage guns and fitness accessories for wholesale buyers.",
+    image: "/images/hero-jump-rope.jpg",
+    imagePosition: "68% 50%",
+    buttonText: "Get Factory Quote"
   },
   detailsIntro: {
     eyebrow: "Engineered Details",
@@ -442,6 +458,7 @@ function mergeContent(defaults: SiteContent, value: Partial<SiteContent>): SiteC
   return {
     brand: { ...defaults.brand, ...value.brand },
     hero: { ...defaults.hero, ...value.hero },
+    promo: { ...defaults.promo, ...value.promo },
     detailsIntro: { ...defaults.detailsIntro, ...value.detailsIntro },
     productDetails: normalizeDetails(value.productDetails, defaults.productDetails),
     homeStats: {

@@ -30,6 +30,7 @@ const homeIconOptions: Array<{ value: HomeIconName; label: string }> = [
 const contentSections = [
   { id: "brand", label: "品牌与联系方式", helper: "邮箱、社媒、WhatsApp" },
   { id: "hero", label: "首页 Hero", helper: "首屏标题和大图" },
+  { id: "promo", label: "宣传页", helper: "/tk 投放页内容" },
   { id: "details", label: "五张全屏图", helper: "轮播大图和文案" },
   { id: "stats", label: "首页数据亮点", helper: "工厂数据统计栏" },
   { id: "factory", label: "工厂实力模块", helper: "工厂图和优势" },
@@ -163,6 +164,27 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
             label="图片裁切位置"
             value={content.hero.imagePosition}
             onChange={(value) => setDeepValue("hero.imagePosition", value)}
+            hint="例如 68% 50%，第一个值是左右位置，第二个值是上下位置。"
+          />
+        </div>
+      </Section>
+
+      <Section id="promo" title="宣传页">
+        <div className="grid gap-4">
+          <TextField label="小标题" value={content.promo.eyebrow} onChange={(value) => setDeepValue("promo.eyebrow", value)} />
+          <TextField label="主标题" value={content.promo.title} onChange={(value) => setDeepValue("promo.title", value)} />
+          <TextareaField label="描述" value={content.promo.description} onChange={(value) => setDeepValue("promo.description", value)} />
+          <TextField label="按钮文字" value={content.promo.buttonText} onChange={(value) => setDeepValue("promo.buttonText", value)} />
+          <ImageField
+            label="宣传页 Hero 图片"
+            value={content.promo.image}
+            onChange={(url) => updateImage("promo.image", url)}
+            hint="建议尺寸：1080 x 1920px，竖版 9:16，适合手机端投放页。主体尽量居中或偏右，左侧保留文字空间。"
+          />
+          <TextField
+            label="图片裁切位置"
+            value={content.promo.imagePosition}
+            onChange={(value) => setDeepValue("promo.imagePosition", value)}
             hint="例如 68% 50%，第一个值是左右位置，第二个值是上下位置。"
           />
         </div>
