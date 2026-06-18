@@ -42,3 +42,14 @@ export async function getCloudflarePublicR2Url() {
     ""
   );
 }
+
+export async function runAfterResponse(work: Promise<unknown>) {
+  try {
+    const { getCloudflareContext } = await import("@opennextjs/cloudflare");
+    const context = await getCloudflareContext({ async: true });
+    context.ctx.waitUntil(work);
+    return true;
+  } catch {
+    return false;
+  }
+}

@@ -126,6 +126,9 @@ export type SiteContent = {
 const contentPath = path.join(process.cwd(), ".data", "site-content.json");
 const cloudflareContentKey = "site-content";
 const r2ContentKey = "data/site-content.json";
+const siteContentCacheMs = 30_000;
+
+let cachedSiteContent: { content: SiteContent; expiresAt: number } | null = null;
 
 export const defaultSiteContent: SiteContent = {
   brand: {
@@ -302,6 +305,20 @@ export const defaultSiteContent: SiteContent = {
 };
 
 export async function getSiteContent(): Promise<SiteContent> {
+  if (cachedSiteContent && cachedSiteContent.expiresAt > Date.now()) {
+    return cachedSiteContent.content;
+  }
+
+  const content = await readSiteContent();
+  cachedSiteContent = {
+    content,
+    expiresAt: Date.now() + siteContentCacheMs
+  };
+
+  return content;
+}
+
+async function readSiteContent(): Promise<SiteContent> {
   const kv = await getSiteDataKv();
   if (kv) {
     const raw = await kv.get(cloudflareContentKey);
@@ -330,15 +347,25 @@ export async function saveSiteContent(content: SiteContent) {
 
   if (kv) {
     await kv.put(cloudflareContentKey, JSON.stringify(normalizedContent));
+    updateSiteContentCache(normalizedContent);
     return;
   }
 
   if (await writeR2Json(r2ContentKey, normalizedContent)) {
+    updateSiteContentCache(normalizedContent);
     return;
   }
 
   await mkdir(path.dirname(contentPath), { recursive: true });
   await writeFile(contentPath, JSON.stringify(normalizedContent, null, 2));
+  updateSiteContentCache(normalizedContent);
+}
+
+function updateSiteContentCache(content: SiteContent) {
+  cachedSiteContent = {
+    content,
+    expiresAt: Date.now() + siteContentCacheMs
+  };
 }
 
 function mergeContent(defaults: SiteContent, value: Partial<SiteContent>): SiteContent {

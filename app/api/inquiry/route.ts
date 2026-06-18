@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { runAfterResponse } from "@/lib/cloudflare";
 import { createInquiry } from "@/lib/inquiry-store";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { sendInquiryNotification } from "@/lib/mail";
@@ -27,17 +28,28 @@ export async function POST(request: NextRequest) {
 
     await createInquiry(result.data);
 
-    await sendInquiryNotification(result.data).catch((error) => {
-      console.error("Inquiry notification failed", error);
+    const backgroundWork = Promise.allSettled([
+      sendInquiryNotification(result.data),
+      sendTikTokInquiryEvents({
+        eventIds: tiktokEventIds,
+        inquiry: result.data,
+        request
+      })
+    ]).then((results) => {
+      const [mailResult, tiktokResult] = results;
+
+      if (mailResult.status === "rejected") {
+        console.error("Inquiry notification failed", mailResult.reason);
+      }
+
+      if (tiktokResult.status === "rejected") {
+        console.error("TikTok server event failed", tiktokResult.reason);
+      }
     });
 
-    await sendTikTokInquiryEvents({
-      eventIds: tiktokEventIds,
-      inquiry: result.data,
-      request
-    }).catch((error) => {
-      console.error("TikTok server event failed", error);
-    });
+    if (!(await runAfterResponse(backgroundWork))) {
+      await backgroundWork;
+    }
 
     return NextResponse.json({
       success: true,
