@@ -649,8 +649,17 @@ function InquirySection({ content }: { content: SiteContent }) {
             </SocialLink>
           </div>
         </div>
-        <div className="reveal">
-          <InquiryForm />
+        <div className="reveal rounded-[8px] bg-white p-4 shadow-soft">
+          <div className="relative mb-3 h-48 overflow-hidden rounded-[8px] bg-mist sm:h-52 lg:h-56">
+            <Image
+              src={content.inquiry.image}
+              width={1200}
+              height={720}
+              alt="Wholesale OEM fitness products"
+              className="h-full w-full object-cover"
+            />
+          </div>
+          <InquiryForm compact />
         </div>
       </div>
     </section>

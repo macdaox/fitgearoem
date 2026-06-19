@@ -70,6 +70,7 @@ export type SiteContent = {
     eyebrow: string;
     title: string;
     description: string;
+    image: string;
   };
   serviceProcess: {
     title: string;
@@ -241,7 +242,8 @@ export const defaultSiteContent: SiteContent = {
   inquiry: {
     eyebrow: "Wholesale Inquiry",
     title: "Get wholesale quote.",
-    description: "Share your product interest, quantity and customization needs. Our sales team will prepare a focused quote."
+    description: "Share your product interest, quantity and customization needs. Our sales team will prepare a focused quote.",
+    image: "/images/oem-colors.png"
   },
   serviceProcess: {
     title: "Our Service Process",

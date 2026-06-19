@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { inquiryStatusLabels, inquiryStatuses, type InquiryStatus } from "@/lib/site-data";
 
 export function StatusSelect({ inquiryId, initialStatus }: { inquiryId: string; initialStatus: string }) {
+  const router = useRouter();
   const [status, setStatus] = useState(initialStatus);
   const [saving, setSaving] = useState(false);
 
@@ -21,6 +23,7 @@ export function StatusSelect({ inquiryId, initialStatus }: { inquiryId: string; 
       if (!response.ok) {
         throw new Error("状态更新失败。");
       }
+      router.refresh();
     } finally {
       setSaving(false);
     }

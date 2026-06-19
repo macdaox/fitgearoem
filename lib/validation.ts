@@ -31,11 +31,11 @@ export function validateInquiryPayload(input: unknown): { ok: true; data: Inquir
     country: clean(source.country, 100),
     productInterest: clean(source.productInterest, 140),
     quantity: clean(source.quantity, 80),
-    message: clean(source.message, 1500)
+    message: clean(source.message, 1500) || "Quick contact request from website."
   };
 
-  if (!data.email || !data.message) {
-    return { ok: false, message: "Email and message are required." };
+  if (!data.email) {
+    return { ok: false, message: "Email is required." };
   }
 
   if (!emailPattern.test(data.email)) {

@@ -10,14 +10,19 @@ export type StoredInquiry = Omit<InquiryPayload, "whatsapp" | "country" | "produ
   country?: string | null;
   productInterest?: string | null;
   quantity?: string | null;
+  note?: string | null;
   status: string;
   createdAt: Date;
   updatedAt: Date;
+  contactedAt?: Date | null;
+  deletedAt?: Date | null;
 };
 
-type LocalInquiryRecord = Omit<StoredInquiry, "createdAt" | "updatedAt"> & {
+type LocalInquiryRecord = Omit<StoredInquiry, "createdAt" | "updatedAt" | "contactedAt" | "deletedAt"> & {
   createdAt: string;
   updatedAt: string;
+  contactedAt?: string | null;
+  deletedAt?: string | null;
 };
 
 const localDataDir = path.join(process.cwd(), ".data");
@@ -73,6 +78,7 @@ export async function createInquiry(data: InquiryPayload) {
     inquiries.unshift({
       ...data,
       id: crypto.randomUUID(),
+      note: "",
       status: "new",
       createdAt: now,
       updatedAt: now
@@ -87,6 +93,7 @@ export async function createInquiry(data: InquiryPayload) {
     r2Inquiries.unshift({
       ...data,
       id: crypto.randomUUID(),
+      note: "",
       status: "new",
       createdAt: now,
       updatedAt: now
@@ -106,6 +113,7 @@ export async function createInquiry(data: InquiryPayload) {
   inquiries.unshift({
     ...data,
     id: crypto.randomUUID(),
+    note: "",
     status: "new",
     createdAt: now,
     updatedAt: now
@@ -117,26 +125,64 @@ export async function listInquiries(): Promise<StoredInquiry[]> {
   const kv = await getSiteDataKv();
   if (kv) {
     const inquiries = await readKvInquiries();
-    return inquiries.map(toStoredInquiry).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    return inquiries
+      .filter((inquiry) => !inquiry.deletedAt)
+      .map(toStoredInquiry)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
 
   if (hasR2DataStoreConfig()) {
     const r2Inquiries = (await readR2Inquiries()) || [];
-    return r2Inquiries.map(toStoredInquiry).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    return r2Inquiries
+      .filter((inquiry) => !inquiry.deletedAt)
+      .map(toStoredInquiry)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
 
   if (hasDatabaseUrl()) {
     const { prisma } = await import("@/lib/prisma");
     return prisma.inquiry.findMany({
+      where: { deletedAt: null },
       orderBy: { createdAt: "desc" }
     });
   }
 
   const inquiries = await readLocalInquiries();
-  return inquiries.map(toStoredInquiry);
+  return inquiries.filter((inquiry) => !inquiry.deletedAt).map(toStoredInquiry);
 }
 
 export async function updateInquiryStatus(id: string, status: string) {
+  await updateInquiryRecord(id, (inquiry) => {
+    const now = new Date().toISOString();
+    return {
+      ...inquiry,
+      status,
+      contactedAt: status === "contacted" ? inquiry.contactedAt || now : inquiry.contactedAt || null,
+      updatedAt: now
+    };
+  });
+}
+
+export async function updateInquiryNote(id: string, note: string) {
+  await updateInquiryRecord(id, (inquiry) => ({
+    ...inquiry,
+    note,
+    updatedAt: new Date().toISOString()
+  }));
+}
+
+export async function softDeleteInquiry(id: string) {
+  await updateInquiryRecord(id, (inquiry) => {
+    const now = new Date().toISOString();
+    return {
+      ...inquiry,
+      deletedAt: now,
+      updatedAt: now
+    };
+  });
+}
+
+async function updateInquiryRecord(id: string, updater: (inquiry: LocalInquiryRecord) => LocalInquiryRecord) {
   const kv = await getSiteDataKv();
   if (kv) {
     const inquiries = await readKvInquiries();
@@ -145,11 +191,7 @@ export async function updateInquiryStatus(id: string, status: string) {
       throw new Error("Inquiry not found.");
     }
 
-    inquiries[index] = {
-      ...inquiries[index],
-      status,
-      updatedAt: new Date().toISOString()
-    };
+    inquiries[index] = updater(inquiries[index]);
     await writeKvInquiries(inquiries);
     return;
   }
@@ -161,20 +203,34 @@ export async function updateInquiryStatus(id: string, status: string) {
       throw new Error("Inquiry not found.");
     }
 
-    r2Inquiries[index] = {
-      ...r2Inquiries[index],
-      status,
-      updatedAt: new Date().toISOString()
-    };
+    r2Inquiries[index] = updater(r2Inquiries[index]);
     await writeR2Json(r2InquiriesKey, r2Inquiries);
     return;
   }
 
   if (hasDatabaseUrl()) {
     const { prisma } = await import("@/lib/prisma");
+    const current = await prisma.inquiry.findUnique({ where: { id } });
+    if (!current) {
+      throw new Error("Inquiry not found.");
+    }
+
+    const next = updater({
+      ...current,
+      note: current.note || "",
+      contactedAt: current.contactedAt?.toISOString() || null,
+      deletedAt: current.deletedAt?.toISOString() || null,
+      createdAt: current.createdAt.toISOString(),
+      updatedAt: current.updatedAt.toISOString()
+    });
     await prisma.inquiry.update({
       where: { id },
-      data: { status }
+      data: {
+        status: next.status,
+        note: next.note,
+        contactedAt: next.contactedAt ? new Date(next.contactedAt) : null,
+        deletedAt: next.deletedAt ? new Date(next.deletedAt) : null
+      }
     });
     return;
   }
@@ -185,11 +241,7 @@ export async function updateInquiryStatus(id: string, status: string) {
     throw new Error("Inquiry not found.");
   }
 
-  inquiries[index] = {
-    ...inquiries[index],
-    status,
-    updatedAt: new Date().toISOString()
-  };
+  inquiries[index] = updater(inquiries[index]);
   await writeLocalInquiries(inquiries);
 }
 
@@ -235,7 +287,9 @@ function toStoredInquiry(inquiry: LocalInquiryRecord): StoredInquiry {
   return {
     ...inquiry,
     createdAt: new Date(inquiry.createdAt),
-    updatedAt: new Date(inquiry.updatedAt)
+    updatedAt: new Date(inquiry.updatedAt),
+    contactedAt: inquiry.contactedAt ? new Date(inquiry.contactedAt) : null,
+    deletedAt: inquiry.deletedAt ? new Date(inquiry.deletedAt) : null
   };
 }
 

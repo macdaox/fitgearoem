@@ -1,20 +1,48 @@
 import { redirect } from "next/navigation";
-import { LogOut } from "lucide-react";
+import { LogOut, Search } from "lucide-react";
+import { InquiryActions } from "@/components/InquiryActions";
 import { StatusSelect } from "@/components/StatusSelect";
 import { TranslateMessageButton } from "@/components/TranslateMessageButton";
 import { isAdminAuthenticated } from "@/lib/auth";
 import { getInquiryStoreInfo, listInquiries } from "@/lib/inquiry-store";
-import { inquiryStatusLabels, isInquiryStatus } from "@/lib/site-data";
+import { inquiryStatuses, inquiryStatusLabels, isInquiryStatus, type InquiryStatus } from "@/lib/site-data";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminInquiriesPage() {
+export default async function AdminInquiriesPage({
+  searchParams
+}: {
+  searchParams?: Promise<{
+    status?: string;
+    q?: string;
+  }>;
+}) {
   if (!(await isAdminAuthenticated())) {
     redirect("/admin/login");
   }
 
+  const params = (await searchParams) || {};
+  const activeStatus = params.status && isInquiryStatus(params.status) ? params.status : "all";
+  const query = (params.q || "").trim().toLowerCase();
   const storeInfo = await getInquiryStoreInfo();
   const inquiries = await listInquiries();
+  const filteredInquiries = inquiries.filter((inquiry) => {
+    if (activeStatus !== "all" && inquiry.status !== activeStatus) {
+      return false;
+    }
+
+    if (!query) {
+      return true;
+    }
+
+    return [inquiry.email, inquiry.whatsapp, inquiry.message, inquiry.note]
+      .filter(Boolean)
+      .some((value) => value!.toLowerCase().includes(query));
+  });
+  const statusCounts = {
+    all: inquiries.length,
+    ...Object.fromEntries(inquiryStatuses.map((status) => [status, inquiries.filter((inquiry) => inquiry.status === status).length]))
+  } as Record<"all" | InquiryStatus, number>;
 
   return (
     <main className="min-h-screen bg-mist px-5 py-8 sm:px-8">
@@ -24,7 +52,7 @@ export default async function AdminInquiriesPage() {
             <p className="eyebrow">管理后台</p>
             <h1 className="mt-3 text-4xl font-semibold text-ink">批发询盘管理</h1>
             <p className="mt-2 text-sm text-graphite">
-              共 {inquiries.length} 条询盘 · {storeInfo.label}
+              共 {inquiries.length} 条询盘，当前显示 {filteredInquiries.length} 条 · {storeInfo.label}
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -44,6 +72,37 @@ export default async function AdminInquiriesPage() {
         </div>
 
         <div className="mt-8 grid gap-4">
+          <div className="rounded-[8px] border border-line bg-white p-4 shadow-soft">
+            <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+              <div className="flex flex-wrap gap-2">
+                <StatusFilterLink label="全部" count={statusCounts.all} active={activeStatus === "all"} href={query ? `?q=${encodeURIComponent(query)}` : "/admin/inquiries"} />
+                {inquiryStatuses.map((status) => (
+                  <StatusFilterLink
+                    key={status}
+                    label={inquiryStatusLabels[status]}
+                    count={statusCounts[status]}
+                    active={activeStatus === status}
+                    href={`?status=${status}${query ? `&q=${encodeURIComponent(query)}` : ""}`}
+                  />
+                ))}
+              </div>
+              <form className="flex w-full gap-2 xl:max-w-sm">
+                {activeStatus !== "all" ? <input type="hidden" name="status" value={activeStatus} /> : null}
+                <label className="relative block min-w-0 flex-1">
+                  <span className="sr-only">搜索询盘</span>
+                  <Search size={17} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-graphite" />
+                  <input
+                    name="q"
+                    defaultValue={params.q || ""}
+                    placeholder="搜索邮箱 / WhatsApp / 留言"
+                    className="h-10 w-full rounded-[8px] border border-line bg-white pl-9 pr-3 text-sm text-ink outline-none transition focus:border-ocean"
+                  />
+                </label>
+                <button className="h-10 rounded-[8px] bg-ink px-4 text-sm font-semibold text-white transition hover:bg-graphite">搜索</button>
+              </form>
+            </div>
+          </div>
+
           {storeInfo.isLocalDemo ? (
             <div className="rounded-[8px] border border-ocean/20 bg-white p-5 text-graphite">
               <h2 className="text-lg font-semibold text-ink">本地演示模式</h2>
@@ -53,8 +112,8 @@ export default async function AdminInquiriesPage() {
             </div>
           ) : null}
 
-          {inquiries.length ? (
-            inquiries.map((inquiry) => (
+          {filteredInquiries.length ? (
+            filteredInquiries.map((inquiry) => (
               <article key={inquiry.id} className="rounded-[8px] border border-line bg-white p-5 shadow-soft">
                 <div className="flex flex-col justify-between gap-4 lg:flex-row">
                   <div>
@@ -64,7 +123,10 @@ export default async function AdminInquiriesPage() {
                         {isInquiryStatus(inquiry.status) ? inquiryStatusLabels[inquiry.status] : inquiry.status}
                       </span>
                     </div>
-                    <p className="mt-2 text-sm text-graphite">{inquiry.createdAt.toLocaleString()}</p>
+                    <p className="mt-2 text-sm text-graphite">
+                      提交：{inquiry.createdAt.toLocaleString()}
+                      {inquiry.contactedAt ? ` · 联系：${inquiry.contactedAt.toLocaleString()}` : ""}
+                    </p>
                   </div>
                   <StatusSelect inquiryId={inquiry.id} initialStatus={inquiry.status} />
                 </div>
@@ -72,15 +134,19 @@ export default async function AdminInquiriesPage() {
                 <dl className="mt-5 grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-3">
                   <Field label="邮箱" value={inquiry.email} />
                   <Field label="WhatsApp" value={inquiry.whatsapp} />
-                  <Field label="国家/地区" value={inquiry.country} />
-                  <Field label="感兴趣产品" value={inquiry.productInterest} />
-                  <Field label="采购数量" value={inquiry.quantity} />
+                  {inquiry.productInterest ? <Field label="来源/产品" value={inquiry.productInterest} /> : null}
                 </dl>
 
-                <div className="mt-5 rounded-[8px] bg-mist p-4">
-                  <dt className="text-xs font-semibold uppercase tracking-[0.12em] text-graphite">客户留言</dt>
-                  <dd className="mt-2 whitespace-pre-wrap text-sm leading-6 text-ink">{inquiry.message}</dd>
-                  <TranslateMessageButton text={inquiry.message} />
+                {inquiry.message ? (
+                  <div className="mt-5 rounded-[8px] bg-mist p-4">
+                    <dt className="text-xs font-semibold uppercase tracking-[0.12em] text-graphite">客户留言</dt>
+                    <dd className="mt-2 whitespace-pre-wrap text-sm leading-6 text-ink">{inquiry.message}</dd>
+                    <TranslateMessageButton text={inquiry.message} />
+                  </div>
+                ) : null}
+
+                <div className="mt-5">
+                  <InquiryActions inquiryId={inquiry.id} initialNote={inquiry.note} initialStatus={inquiry.status} />
                 </div>
               </article>
             ))
@@ -90,6 +156,20 @@ export default async function AdminInquiriesPage() {
         </div>
       </section>
     </main>
+  );
+}
+
+function StatusFilterLink({ label, count, active, href }: { label: string; count: number; active: boolean; href: string }) {
+  return (
+    <a
+      href={href}
+      className={`inline-flex h-9 items-center gap-2 rounded-[8px] border px-3 text-sm font-semibold transition ${
+        active ? "border-ink bg-ink text-white" : "border-line bg-white text-graphite hover:border-ink hover:text-ink"
+      }`}
+    >
+      {label}
+      <span className={`rounded-full px-2 py-0.5 text-xs ${active ? "bg-white/15 text-white" : "bg-mist text-graphite"}`}>{count}</span>
+    </a>
   );
 }
 

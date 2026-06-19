@@ -425,6 +425,12 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
           <TextField label="小标题" value={content.inquiry.eyebrow} onChange={(value) => setDeepValue("inquiry.eyebrow", value)} />
           <TextField label="标题" value={content.inquiry.title} onChange={(value) => setDeepValue("inquiry.title", value)} />
           <TextareaField label="描述" value={content.inquiry.description} onChange={(value) => setDeepValue("inquiry.description", value)} />
+          <ImageField
+            label="表单上方图片"
+            value={content.inquiry.image}
+            onChange={(url) => updateImage("inquiry.image", url)}
+            hint="建议尺寸：1200 x 720px 或 1600 x 960px，横版 5:3。前台会固定高度裁切展示，避免表单区域跳动。"
+          />
         </div>
       </Section>
 

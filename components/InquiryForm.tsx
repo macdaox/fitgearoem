@@ -3,12 +3,12 @@
 import { useState } from "react";
 import { MessageCircle, Send } from "lucide-react";
 import { TrackedLink } from "@/components/TrackedLink";
-import { getWhatsAppHref, products } from "@/lib/site-data";
+import { getWhatsAppHref } from "@/lib/site-data";
 import { trackTikTokEvent } from "@/lib/tiktok-events";
 
 type SubmitState = "idle" | "submitting" | "success" | "error";
 
-export function InquiryForm() {
+export function InquiryForm({ compact = false }: { compact?: boolean }) {
   const [state, setState] = useState<SubmitState>("idle");
   const [message, setMessage] = useState("");
 
@@ -59,37 +59,11 @@ export function InquiryForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="grid gap-4 rounded-[8px] bg-white p-5 shadow-soft sm:p-7">
+    <form onSubmit={handleSubmit} className={compact ? "grid gap-4" : "grid gap-4 rounded-[8px] bg-white p-5 shadow-soft sm:p-7"}>
       <div className="grid gap-4 md:grid-cols-2">
         <Field label="Email" name="email" type="email" required />
         <Field label="WhatsApp" name="whatsapp" />
       </div>
-
-      <label className="grid gap-2 text-sm font-medium text-graphite">
-        Product Interest
-        <select
-          name="productInterest"
-          className="h-12 rounded-[8px] border border-line bg-white px-3 text-ink outline-none transition focus:border-ocean"
-        >
-          <option value="">Select a product</option>
-          {products.map((product) => (
-            <option key={product.name} value={product.name}>
-              {product.name}
-            </option>
-          ))}
-        </select>
-      </label>
-
-      <label className="grid gap-2 text-sm font-medium text-graphite">
-        Message
-        <textarea
-          name="message"
-          required
-          rows={5}
-          placeholder="Tell us your target product, color, logo, packaging and order quantity."
-          className="resize-none rounded-[8px] border border-line bg-white px-3 py-3 text-ink outline-none transition focus:border-ocean"
-        />
-      </label>
 
       <button
         type="submit"
