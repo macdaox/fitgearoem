@@ -845,7 +845,7 @@ async function compressImageForUpload(file: File) {
   }
 
   const image = await createImageBitmap(file);
-  const maxDimension = 2400;
+  const maxDimension = 1920;
   const scale = Math.min(1, maxDimension / Math.max(image.width, image.height));
   const width = Math.max(1, Math.round(image.width * scale));
   const height = Math.max(1, Math.round(image.height * scale));
@@ -865,8 +865,8 @@ async function compressImageForUpload(file: File) {
   context.drawImage(image, 0, 0, width, height);
   image.close();
 
-  const webpBlob = await canvasToBlob(canvas, "image/webp", 0.82);
-  const outputBlob = webpBlob || (await canvasToBlob(canvas, "image/jpeg", 0.84));
+  const webpBlob = await canvasToBlob(canvas, "image/webp", 0.76);
+  const outputBlob = webpBlob || (await canvasToBlob(canvas, "image/jpeg", 0.78));
 
   if (!outputBlob || outputBlob.size >= file.size) {
     return file;
