@@ -14,6 +14,7 @@ type TikTokServerEventPayload = {
     user_agent?: string;
     ttp?: string;
     ttclid?: string;
+    external_id?: string;
   };
   page: {
     url: string;
@@ -116,6 +117,7 @@ async function buildTikTokUser(request: NextRequest, inquiry: InquiryPayload): P
   const ip = getClientIp(request);
   const ttp = request.cookies.get("_ttp")?.value;
   const ttclid = request.nextUrl.searchParams.get("ttclid") || request.cookies.get("ttclid")?.value || undefined;
+  const externalId = await sha256(normalizeExternalId(request.cookies.get("fg_external_id")?.value || ""));
 
   return removeEmptyValues({
     email,
@@ -123,7 +125,8 @@ async function buildTikTokUser(request: NextRequest, inquiry: InquiryPayload): P
     ip,
     user_agent: userAgent,
     ttp,
-    ttclid
+    ttclid,
+    external_id: externalId
   });
 }
 
@@ -165,6 +168,10 @@ function normalizeEmail(value: string) {
 
 function normalizePhone(value: string) {
   return value.replace(/[^\d+]/g, "");
+}
+
+function normalizeExternalId(value: string) {
+  return value.trim();
 }
 
 async function sha256(value: string) {

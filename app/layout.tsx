@@ -40,7 +40,42 @@ export default function RootLayout({
               var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js",o=n&&n.partner;ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=r,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};n=document.createElement("script")
               ;n.type="text/javascript",n.async=!0,n.src=r+"?sdkid="+e+"&lib="+t;e=document.getElementsByTagName("script")[0];e.parentNode.insertBefore(n,e)};
 
+              function setFitGearCookie(name, value, maxAge) {
+                var secure = w.location.protocol === "https:" ? "; Secure" : "";
+                d.cookie = name + "=" + encodeURIComponent(value) + "; path=/; max-age=" + maxAge + "; SameSite=Lax" + secure;
+              }
+
+              function persistQueryParam(name, maxAge) {
+                try {
+                  var value = new URLSearchParams(w.location.search).get(name);
+                  if (value) setFitGearCookie(name, value, maxAge);
+                } catch (error) {}
+              }
+
+              function getFitGearExternalId() {
+                var key = "fitgear_external_id";
+                try {
+                  var externalId = w.localStorage ? w.localStorage.getItem(key) : "";
+                  if (!externalId) {
+                    externalId = w.crypto && w.crypto.randomUUID
+                      ? w.crypto.randomUUID()
+                      : String(Date.now()) + "-" + Math.random().toString(16).slice(2);
+                    if (w.localStorage) w.localStorage.setItem(key, externalId);
+                  }
+                  setFitGearCookie("fg_external_id", externalId, 31536000);
+                  return externalId;
+                } catch (error) {
+                  return "";
+                }
+              }
+
+              persistQueryParam("ttclid", 7776000);
+              var fitGearExternalId = getFitGearExternalId();
+
               ttq.load(${JSON.stringify(tiktokPixelCode)});
+              if (fitGearExternalId) {
+                ttq.identify({ external_id: fitGearExternalId });
+              }
               ttq.page();
             }(window, document, 'ttq');
           `}

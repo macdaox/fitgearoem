@@ -4,7 +4,7 @@ import { useState } from "react";
 import { MessageCircle, Send } from "lucide-react";
 import { TrackedLink } from "@/components/TrackedLink";
 import { getWhatsAppHref } from "@/lib/site-data";
-import { trackTikTokEvent } from "@/lib/tiktok-events";
+import { identifyTikTokUser, trackTikTokEvent } from "@/lib/tiktok-events";
 
 type SubmitState = "idle" | "submitting" | "success" | "error";
 
@@ -40,6 +40,10 @@ export function InquiryForm({ compact = false }: { compact?: boolean }) {
         throw new Error(result.message || "Submission failed.");
       }
 
+      identifyTikTokUser({
+        email: formData.get("email"),
+        phone: formData.get("whatsapp")
+      });
       trackTikTokEvent("SubmitForm", {
         form_name: "Wholesale Inquiry",
         event_id: result.eventIds?.submitForm
