@@ -21,6 +21,12 @@
       "id": "4b6ef03aa64a4b78951d3f2bfbbd6489"
     }
   ],
+  "r2_buckets": [
+    {
+      "binding": "SITE_IMAGES",
+      "bucket_name": "jump-rope-site-images"
+    }
+  ],
   "images": {
     "binding": "IMAGES"
   }

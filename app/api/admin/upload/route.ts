@@ -2,7 +2,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { NextRequest, NextResponse } from "next/server";
 import { isAdminAuthenticated } from "@/lib/auth";
-import { getCloudflarePublicR2Url, getSiteImagesBucket } from "@/lib/cloudflare";
+import { getCloudflareBindings, getCloudflarePublicR2Url, getSiteImagesBucket } from "@/lib/cloudflare";
 
 export async function POST(request: NextRequest) {
   if (!(await isAdminAuthenticated())) {
@@ -37,16 +37,26 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, url: localUrl, storage: "local" });
   } catch (error) {
     console.error("Image upload failed", error);
-    return NextResponse.json({ success: false, message: "图片上传失败，请检查 Cloudflare 配置。" }, { status: 500 });
+    const message = error instanceof UploadConfigError ? error.message : "图片上传失败，请检查 Cloudflare 配置。";
+    return NextResponse.json({ success: false, message }, { status: 500 });
   }
 }
 
 async function uploadToR2Binding(key: string, file: File, contentType: string) {
+  const bindings = await getCloudflareBindings();
   const bucket = await getSiteImagesBucket();
   const publicUrl = await getCloudflarePublicR2Url();
 
-  if (!bucket || !publicUrl) {
+  if (!bindings) {
     return null;
+  }
+
+  if (!bucket) {
+    throw new UploadConfigError("正式环境缺少 R2 绑定 `SITE_IMAGES`，请在 Cloudflare 绑定 R2 bucket 后重新部署。");
+  }
+
+  if (!publicUrl) {
+    throw new UploadConfigError("正式环境缺少变量 `CLOUDFLARE_R2_PUBLIC_URL`，请填写 R2 的公开访问地址后重新部署。");
   }
 
   await bucket.put(key, file.stream(), {
@@ -57,6 +67,8 @@ async function uploadToR2Binding(key: string, file: File, contentType: string) {
 
   return `${publicUrl.replace(/\/$/, "")}/${key}`;
 }
+
+class UploadConfigError extends Error {}
 
 async function uploadLocally(key: string, file: File) {
   const relativePath = path.join("uploads", key);
