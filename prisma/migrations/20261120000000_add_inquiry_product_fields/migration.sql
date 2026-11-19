@@ -1,0 +1,3 @@
+ALTER TABLE "inquiries" ADD COLUMN IF NOT EXISTS "productCategory" TEXT;
+ALTER TABLE "inquiries" ADD COLUMN IF NOT EXISTS "productType" TEXT;
+ALTER TABLE "inquiries" ADD COLUMN IF NOT EXISTS "buyerType" TEXT;

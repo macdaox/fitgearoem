@@ -134,6 +134,10 @@ export default async function AdminInquiriesPage({
                 <dl className="mt-5 grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-3">
                   <Field label="邮箱" value={inquiry.email} />
                   <Field label="WhatsApp" value={inquiry.whatsapp} />
+                  {inquiry.productCategory ? <Field label="产品分类" value={inquiry.productCategory} /> : null}
+                  {inquiry.productType ? <Field label="产品类型" value={inquiry.productType} /> : null}
+                  {inquiry.buyerType ? <Field label="买家类型" value={inquiry.buyerType} /> : null}
+                  {inquiry.quantity ? <Field label="需求数量" value={inquiry.quantity} /> : null}
                   {inquiry.productInterest ? <Field label="来源/产品" value={inquiry.productInterest} /> : null}
                 </dl>
 

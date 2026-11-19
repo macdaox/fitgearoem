@@ -17,6 +17,10 @@ export async function sendInquiryNotification(inquiry: InquiryPayload) {
       `Email: ${inquiry.email}`,
       `WhatsApp: ${inquiry.whatsapp || "-"}`,
       `Product Interest: ${inquiry.productInterest || "-"}`,
+      `Product Category: ${inquiry.productCategory || "-"}`,
+      `Product Type: ${inquiry.productType || "-"}`,
+      `Buyer Type: ${inquiry.buyerType || "-"}`,
+      `Required Quantity: ${inquiry.quantity || "-"}`,
       `Message: ${inquiry.message}`,
       `Submit Time: ${submittedAt}`
     ].join("\n")

@@ -8,7 +8,10 @@ import { identifyTikTokUser, trackTikTokEvent } from "@/lib/tiktok-events";
 
 type SubmitState = "idle" | "submitting" | "success" | "error";
 
-export function InquiryForm({ compact = false }: { compact?: boolean }) {
+const buyerTypes = ["Brand", "Importer / Distributor", "Retailer / Online Seller", "Gym / Sports Club", "School", "Other"];
+
+export function InquiryForm({ compact = false, categories }: { compact?: boolean; categories: string[] }) {
+  const categoryOptions = [...new Set(categories.map((name) => name.trim()).filter(Boolean))];
   const [state, setState] = useState<SubmitState>("idle");
   const [message, setMessage] = useState("");
 
@@ -67,6 +70,10 @@ export function InquiryForm({ compact = false }: { compact?: boolean }) {
       <div className="grid gap-4 md:grid-cols-2">
         <Field label="Email" name="email" type="email" required />
         <Field label="WhatsApp" name="whatsapp" />
+        <SelectField label="Product Category" name="productCategory" options={[...new Set([...categoryOptions, "Other"])]} />
+        <Field label="Product Type" name="productType" placeholder="e.g. Digital jump rope" maxLength={140} />
+        <SelectField label="Buyer Type" name="buyerType" options={buyerTypes} />
+        <Field label="Required Quantity (units)" name="quantity" placeholder="e.g. 500" inputMode="numeric" pattern="[1-9][0-9]*" maxLength={80} />
       </div>
 
       <button
@@ -109,13 +116,19 @@ function Field({
   name,
   type = "text",
   placeholder,
-  required
+  required,
+  inputMode,
+  pattern,
+  maxLength
 }: {
   label: string;
   name: string;
   type?: string;
   placeholder?: string;
   required?: boolean;
+  inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
+  pattern?: string;
+  maxLength?: number;
 }) {
   return (
     <label className="grid gap-2 text-sm font-medium text-graphite">
@@ -125,8 +138,27 @@ function Field({
         type={type}
         required={required}
         placeholder={placeholder}
+        inputMode={inputMode}
+        pattern={pattern}
+        maxLength={maxLength}
         className="h-12 rounded-[8px] border border-line bg-white px-3 text-ink outline-none transition focus:border-ocean"
       />
+    </label>
+  );
+}
+
+function SelectField({ label, name, options }: { label: string; name: string; options: string[] }) {
+  return (
+    <label className="grid min-w-0 gap-2 text-sm font-medium text-graphite">
+      {label}
+      <select
+        name={name}
+        defaultValue=""
+        className="h-12 min-w-0 rounded-[8px] border border-line bg-white px-3 text-ink outline-none transition focus:border-ocean"
+      >
+        <option value="">Select an option</option>
+        {options.map((option) => <option key={option} value={option}>{option}</option>)}
+      </select>
     </label>
   );
 }

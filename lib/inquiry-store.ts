@@ -4,11 +4,14 @@ import { getSiteDataKv } from "@/lib/cloudflare";
 import { hasR2DataStoreConfig, readR2Json, writeR2Json } from "@/lib/r2-data-store";
 import type { InquiryPayload } from "@/lib/validation";
 
-export type StoredInquiry = Omit<InquiryPayload, "whatsapp" | "country" | "productInterest" | "quantity"> & {
+export type StoredInquiry = Omit<InquiryPayload, "whatsapp" | "country" | "productInterest" | "productCategory" | "productType" | "buyerType" | "quantity"> & {
   id: string;
   whatsapp?: string | null;
   country?: string | null;
   productInterest?: string | null;
+  productCategory?: string | null;
+  productType?: string | null;
+  buyerType?: string | null;
   quantity?: string | null;
   note?: string | null;
   status: string;

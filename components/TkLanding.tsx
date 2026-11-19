@@ -106,7 +106,7 @@ export function TkLanding({ content }: { content: SiteContent }) {
                 <X size={20} />
               </button>
             </div>
-            <InquiryForm />
+            <InquiryForm categories={content.homeProducts.categories.map(({ name }) => name)} />
           </div>
         </div>
       ) : null}

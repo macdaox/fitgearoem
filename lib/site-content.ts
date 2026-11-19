@@ -488,7 +488,9 @@ function mergeContent(defaults: SiteContent, value: Partial<SiteContent>): SiteC
     homeProducts: {
       ...defaults.homeProducts,
       ...value.homeProducts,
-      categories: normalizeObjectList(value.homeProducts?.categories, defaults.homeProducts.categories),
+      categories: value.homeProducts?.categories?.length === 0
+        ? []
+        : normalizeObjectList(value.homeProducts?.categories, defaults.homeProducts.categories),
       featuredItems: normalizeObjectList(value.homeProducts?.featuredItems, defaults.homeProducts.featuredItems),
       kidsItems: normalizeObjectList(value.homeProducts?.kidsItems, defaults.homeProducts.kidsItems)
     },

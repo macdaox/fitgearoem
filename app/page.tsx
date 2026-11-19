@@ -659,7 +659,7 @@ function InquirySection({ content }: { content: SiteContent }) {
               className="h-full w-full object-cover"
             />
           </div>
-          <InquiryForm compact />
+          <InquiryForm compact categories={content.homeProducts.categories.map(({ name }) => name)} />
         </div>
       </div>
     </section>

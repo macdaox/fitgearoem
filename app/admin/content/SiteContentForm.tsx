@@ -46,6 +46,15 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
 
+  const [categoryUploads, setCategoryUploads] = useState(0);
+
+  function setCategories(update: (categories: SiteContent["homeProducts"]["categories"]) => SiteContent["homeProducts"]["categories"]) {
+    setContent((current) => ({
+      ...current,
+      homeProducts: { ...current.homeProducts, categories: update(current.homeProducts.categories) }
+    }));
+  }
+
   async function save() {
     setSaving(true);
     setMessage("");
@@ -363,10 +372,21 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
               value={content.homeProducts.categoriesTitle}
               onChange={(value) => setDeepValue("homeProducts.categoriesTitle", value)}
             />
+            <p className="mt-3 text-sm text-graphite">分类名称会同步到首页和 TikTok 落地页的询盘表单。</p>
             <div className="mt-4 grid gap-4">
               {content.homeProducts.categories.map((item, index) => (
                 <div key={index} className="rounded-[8px] border border-line bg-white p-4">
-                  <p className="mb-4 text-sm font-semibold text-ink">分类卡片 {index + 1}</p>
+                  <div className="mb-4 flex items-center justify-between gap-3">
+                    <p className="text-sm font-semibold text-ink">分类卡片 {index + 1}</p>
+                    <button
+                      type="button"
+                      disabled={categoryUploads > 0}
+                      onClick={() => setCategories((categories) => categories.filter((_, position) => position !== index))}
+                      className="text-sm font-semibold text-red-700 disabled:opacity-50"
+                    >
+                      删除分类
+                    </button>
+                  </div>
                   <div className="grid gap-4 md:grid-cols-2">
                     <TextField
                       label="分类名称"
@@ -375,6 +395,7 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
                     />
                     <ImageField
                       label="分类图片"
+                      onUploadChange={(uploading) => setCategoryUploads((count) => count + (uploading ? 1 : -1))}
                       value={item.image}
                       onChange={(url) => updateImage(`homeProducts.categories.${index}.image`, url)}
                       hint="建议尺寸：900 x 620px 或 1200 x 820px，横版。用于上方深色产品分类卡片。"
@@ -390,6 +411,16 @@ export function SiteContentForm({ initialContent }: { initialContent: SiteConten
                 </div>
               ))}
             </div>
+            <button
+              type="button"
+              onClick={() => setCategories((categories) => [
+                ...categories,
+                { name: "New Category", description: "", image: "/images/hero-jump-rope.jpg" }
+              ])}
+              className="mt-4 rounded-[8px] border border-line bg-white px-4 py-2 text-sm font-semibold text-ink"
+            >
+              添加分类
+            </button>
           </div>
 
           <ProductListEditor
@@ -760,18 +791,21 @@ function ImageField({
   label,
   value,
   hint,
-  onChange
+  onChange,
+  onUploadChange
 }: {
   label: string;
   value: string;
   hint?: string;
   onChange: (value: string) => void;
+  onUploadChange?: (uploading: boolean) => void;
 }) {
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState("");
 
   async function upload(file: File) {
     setUploading(true);
+    onUploadChange?.(true);
     setMessage("");
 
     try {
@@ -799,6 +833,7 @@ function ImageField({
       setMessage(error instanceof Error ? error.message : "上传失败。");
     } finally {
       setUploading(false);
+      onUploadChange?.(false);
     }
   }
 

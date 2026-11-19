@@ -14,6 +14,9 @@ model Inquiry {
   whatsapp        String?
   country         String?
   productInterest String?
+  productCategory String?
+  productType     String?
+  buyerType       String?
   quantity        String?
   message         String
   note            String?

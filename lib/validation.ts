@@ -4,6 +4,9 @@ export type InquiryPayload = {
   whatsapp?: string;
   country?: string;
   productInterest?: string;
+  productCategory?: string;
+  productType?: string;
+  buyerType?: string;
   quantity?: string;
   message: string;
 };
@@ -30,6 +33,9 @@ export function validateInquiryPayload(input: unknown): { ok: true; data: Inquir
     whatsapp: clean(source.whatsapp, 80),
     country: clean(source.country, 100),
     productInterest: clean(source.productInterest, 140),
+    productCategory: clean(source.productCategory, 140),
+    productType: clean(source.productType, 140),
+    buyerType: clean(source.buyerType, 100),
     quantity: clean(source.quantity, 80),
     message: clean(source.message, 1500) || "Quick contact request from website."
   };
@@ -40,6 +46,14 @@ export function validateInquiryPayload(input: unknown): { ok: true; data: Inquir
 
   if (!emailPattern.test(data.email)) {
     return { ok: false, message: "Please enter a valid email address." };
+  }
+
+  const usesProductFields = "productCategory" in source || "productType" in source || "buyerType" in source;
+  if (usesProductFields && source.quantity != null) {
+    const quantity = typeof source.quantity === "string" ? source.quantity.trim() : null;
+    if (quantity !== "" && (quantity === null || !/^[1-9][0-9]{0,79}$/.test(quantity))) {
+      return { ok: false, message: "Please enter a positive whole number for quantity." };
+    }
   }
 
   return { ok: true, data };
