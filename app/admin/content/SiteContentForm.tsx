@@ -656,6 +656,11 @@ function ProductListEditor({
               <div className="grid content-start gap-4 md:grid-cols-2 xl:grid-cols-1">
                 <TextField label="产品名称" value={item.name} onChange={(value) => setDeepValue(`${itemPath}.${index}.name`, value)} />
                 <TextField label="型号/标签" value={item.code} onChange={(value) => setDeepValue(`${itemPath}.${index}.code`, value)} />
+                <TextareaField
+                  label="产品详情描述"
+                  value={item.description ?? ""}
+                  onChange={(value) => setDeepValue(`${itemPath}.${index}.description`, value)}
+                />
               </div>
               <div className="min-w-0">
                 <ImageField

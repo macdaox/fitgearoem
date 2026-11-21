@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import type { ReactNode } from "react";
 import {
   ArrowRight,
@@ -11,7 +12,6 @@ import {
   CheckCircle2,
   ClipboardCheck,
   Cog,
-  Download,
   Factory,
   FileText,
   Globe2,
@@ -33,6 +33,7 @@ import { InquiryForm } from "@/components/InquiryForm";
 import { ScrollAnimations } from "@/components/ScrollAnimations";
 import { TrackedLink } from "@/components/TrackedLink";
 import { getSiteContent, type HomeIconName, type SiteContent } from "@/lib/site-content";
+import { getProductCatalog } from "@/lib/product-catalog";
 import { getWhatsAppHref } from "@/lib/site-data";
 
 export const dynamic = "force-dynamic";
@@ -103,7 +104,7 @@ function Header({ content }: { content: SiteContent }) {
           <a href="/" className="border-b-2 border-[#1d82ff] py-6 text-white">
             Home
           </a>
-          <a href="#products" className="py-6 transition hover:text-white">
+          <a href="/products" className="py-6 transition hover:text-white">
             Products
           </a>
           <a href="#oem" className="py-6 transition hover:text-white">
@@ -127,10 +128,10 @@ function Header({ content }: { content: SiteContent }) {
             Get Factory Quote
           </a>
           <a
-            href="#products"
+            href="/products"
             className="hidden h-10 items-center gap-2 rounded-[6px] border border-white/28 px-4 text-xs font-bold uppercase text-white transition hover:border-white sm:inline-flex"
           >
-            Download Catalog
+            Product Catalog
           </a>
           <a
             href="#inquiry"
@@ -188,11 +189,11 @@ function Hero({ content }: { content: SiteContent }) {
               <ArrowRight size={18} />
             </a>
             <a
-              href="#products"
+              href="/products"
               className="inline-flex h-[52px] items-center justify-center gap-3 rounded-[6px] border border-white/30 bg-white/5 px-7 text-sm font-bold uppercase text-white backdrop-blur transition hover:border-white hover:bg-white/10"
             >
-              Download Catalog
-              <Download size={17} />
+              Product Catalog
+              <ArrowRight size={17} />
             </a>
           </div>
         </div>
@@ -348,6 +349,7 @@ function OemServiceBand({ content }: { content: SiteContent }) {
 }
 
 function ProductSeries({ content }: { content: SiteContent }) {
+  const { series } = getProductCatalog(content);
   return (
     <section id="products" className="bg-[#f4f7fb] pb-7">
       <div className="section-shell">
@@ -357,8 +359,8 @@ function ProductSeries({ content }: { content: SiteContent }) {
         </div>
 
         <div className="mt-6 grid gap-2 md:grid-cols-3 xl:grid-cols-5">
-          {content.homeProducts.categories.map((product) => (
-            <article key={product.name} className="reveal group relative overflow-hidden rounded-[8px] bg-[#071016] shadow-soft">
+          {series.map((product) => (
+            <article key={product.slug} className="reveal group relative overflow-hidden rounded-[8px] bg-[#071016] shadow-soft">
               <Image
                 src={product.image}
                 width={900}
@@ -370,10 +372,10 @@ function ProductSeries({ content }: { content: SiteContent }) {
               <div className="absolute inset-x-0 bottom-0 p-5">
                 <h3 className="text-lg font-black uppercase text-white">{product.name}</h3>
                 <p className="mt-1 line-clamp-1 text-xs text-white/70">{product.description}</p>
-                <a href="#inquiry" className="mt-4 inline-flex items-center gap-2 text-xs font-black uppercase text-[#48a5ff]">
+                <Link href={product.href} aria-label={`View more about ${product.name}`} className="mt-4 inline-flex items-center gap-2 text-xs font-black uppercase text-[#48a5ff]">
                   View More
                   <ArrowRight size={14} />
-                </a>
+                </Link>
               </div>
             </article>
           ))}
@@ -384,17 +386,20 @@ function ProductSeries({ content }: { content: SiteContent }) {
 }
 
 function ProductCollections({ content }: { content: SiteContent }) {
+  const { featured, kids } = getProductCatalog(content);
   return (
     <section className="bg-[#f4f7fb] pb-7">
       <div className="section-shell grid items-stretch gap-5 lg:grid-cols-2">
         <ProductGridPanel
           title={content.homeProducts.featuredTitle}
-          items={content.homeProducts.featuredItems}
+          items={featured}
+          href="/products"
           action={content.homeProducts.featuredAction}
         />
         <ProductGridPanel
           title={content.homeProducts.kidsTitle}
-          items={content.homeProducts.kidsItems}
+          items={kids}
+          href="/products#kids"
           action={content.homeProducts.kidsAction}
         />
       </div>
@@ -405,10 +410,12 @@ function ProductCollections({ content }: { content: SiteContent }) {
 function ProductGridPanel({
   title,
   items,
-  action
+  action,
+  href
 }: {
   title: string;
-  items: Array<{ name: string; code?: string; image: string }>;
+  items: ReturnType<typeof getProductCatalog>["featured"];
+  href: string;
   action: string;
 }) {
   const placeholders = Array.from({ length: Math.max(0, 5 - items.length) });
@@ -417,15 +424,16 @@ function ProductGridPanel({
     <section className="reveal flex h-full flex-col rounded-[8px] border border-line bg-white p-5 shadow-soft">
       <div className="flex items-center justify-between gap-4">
         <h2 className="text-lg font-black uppercase text-[#081422]">{title}</h2>
-        <a href="#inquiry" className="inline-flex items-center gap-2 text-xs font-black uppercase text-[#0d7cff]">
+        <Link href={href} className="inline-flex items-center gap-2 text-xs font-black uppercase text-[#0d7cff]">
           {action}
           <ArrowRight size={14} />
-        </a>
+        </Link>
       </div>
       <div className="mt-5 grid flex-1 grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-5">
         {items.map((item) => (
-          <article
-            key={item.name}
+          <Link
+            href={item.href}
+            key={item.slug}
             className="flex min-h-[17rem] flex-col overflow-hidden rounded-[8px] border border-line bg-[#f8fafc] text-center transition hover:-translate-y-1 hover:shadow-soft"
           >
             <div className="h-40 w-full bg-white">
@@ -435,7 +443,7 @@ function ProductGridPanel({
               <h3 className="flex min-h-16 items-center justify-center text-sm font-bold leading-5 text-[#081422]">{item.name}</h3>
               <p className="mt-1 min-h-5 text-xs font-semibold text-graphite">{item.code || "OEM"}</p>
             </div>
-          </article>
+          </Link>
         ))}
         {placeholders.map((_, index) => (
           <div key={`placeholder-${index}`} aria-hidden="true" className="hidden rounded-[8px] border border-transparent xl:block" />
@@ -715,10 +723,11 @@ function FacebookIcon() {
 }
 
 function Footer({ content }: { content: SiteContent }) {
+  const { series } = getProductCatalog(content);
   const quickLinks = [
     { label: "Home", href: "/" },
     { label: "About Us", href: "/about" },
-    { label: "Products", href: "#products" },
+    { label: "Products", href: "/products" },
     { label: "OEM/ODM", href: "#oem" },
     { label: "Factory", href: "#factory" },
     { label: "Contact Us", href: "#inquiry" }
@@ -768,10 +777,10 @@ function Footer({ content }: { content: SiteContent }) {
           </FooterColumn>
 
           <FooterColumn title="Products">
-            {content.homeProducts.categories.map((product) => (
-              <a key={product.name} href="#products" className="footer-link">
+            {series.map((product) => (
+              <Link key={product.slug} href={product.href} className="footer-link">
                 {product.name}
-              </a>
+              </Link>
             ))}
           </FooterColumn>
 

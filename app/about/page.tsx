@@ -5,7 +5,6 @@ import {
   ArrowRight,
   BadgeCheck,
   CheckCircle2,
-  Download,
   Mail,
   MessageCircle,
   PackageCheck,
@@ -57,7 +56,7 @@ function AboutHeader({ content }: { content: SiteContent }) {
           <a href="/" className="py-6 transition hover:text-white">
             Home
           </a>
-          <a href="/#products" className="py-6 transition hover:text-white">
+          <a href="/products" className="py-6 transition hover:text-white">
             Products
           </a>
           <a href="/#oem" className="py-6 transition hover:text-white">
@@ -81,10 +80,10 @@ function AboutHeader({ content }: { content: SiteContent }) {
             Get Factory Quote
           </a>
           <a
-            href="/#products"
+            href="/products"
             className="hidden h-10 items-center gap-2 rounded-[6px] border border-white/28 px-4 text-xs font-bold uppercase text-white transition hover:border-white sm:inline-flex"
           >
-            Download Catalog
+            Product Catalog
           </a>
         </div>
       </nav>
@@ -144,11 +143,11 @@ function AboutHero({ content }: { content: SiteContent }) {
               {content.about.secondaryCta}
             </a>
             <a
-              href="/#products"
+              href="/products"
               className="inline-flex h-[52px] items-center justify-center gap-3 rounded-[6px] border border-white/30 bg-white/5 px-7 text-sm font-bold uppercase text-white backdrop-blur transition hover:border-white hover:bg-white/10"
             >
-              Download Catalog
-              <Download size={17} />
+              Product Catalog
+              <ArrowRight size={17} />
             </a>
           </div>
         </div>
@@ -343,7 +342,7 @@ function AboutFooter({ content }: { content: SiteContent }) {
 
           <AboutFooterColumn title="Products">
             {content.homeProducts.categories.map((product) => (
-              <a key={product.name} href="/#products" className="footer-link">
+              <a key={product.name} href="/products" className="footer-link">
                 {product.name}
               </a>
             ))}

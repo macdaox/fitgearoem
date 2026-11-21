@@ -109,6 +109,7 @@ export type SiteContent = {
       name: string;
       code: string;
       image: string;
+      description?: string;
     }>;
     kidsTitle: string;
     kidsAction: string;
@@ -116,6 +117,7 @@ export type SiteContent = {
       name: string;
       code: string;
       image: string;
+      description?: string;
     }>;
   };
   about: {
